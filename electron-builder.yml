@@ -53,5 +53,5 @@ mac:
 
 publish:
   provider: github
-  owner: onlicert
-  repo: manager
+  owner: onlitec
+  repo: OnliCerManager

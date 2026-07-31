@@ -3,7 +3,7 @@
 > **Professional certificate management with local CA support.**
 > No command-line knowledge required. Powered by OpenSSL.
 
-[![CI](https://github.com/onlicert/manager/actions/workflows/ci.yml/badge.svg)](https://github.com/onlicert/manager/actions)
+[![CI](https://github.com/onlitec/OnliCerManager/actions/workflows/ci.yml/badge.svg)](https://github.com/onlitec/OnliCerManager/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ---
@@ -33,8 +33,8 @@ Everything runs locally. No cloud. No accounts required.
 
 ```bash
 # Clone the repository
-git clone https://github.com/onlicert/manager.git
-cd manager
+git clone https://github.com/onlitec/OnliCerManager.git
+cd OnliCerManager
 
 # Install dependencies
 pnpm install
