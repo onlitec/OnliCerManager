@@ -1,0 +1,171 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "ca": "Certificate Authority",
+    "certificates": "Certificates",
+    "servers": "Servers",
+    "settings": "Settings",
+    "plugins": "Plugins"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your certificate environment",
+    "stats": {
+      "totalCerts": "Total Certificates",
+      "totalServers": "Configured Servers",
+      "expiringSoon": "Expiring Soon",
+      "caStatus": "CA Status"
+    },
+    "caStatus": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "none": "No CA configured"
+    },
+    "recentEvents": "Recent Events",
+    "noEvents": "No events recorded",
+    "expiringCerts": "Expiring Certificates"
+  },
+  "ca": {
+    "title": "Certificate Authority",
+    "subtitle": "Manage your local CA",
+    "create": "Create CA",
+    "import": "Import CA",
+    "export": "Export CA",
+    "backup": "Backup CA",
+    "restore": "Restore Backup",
+    "changePassword": "Change Password",
+    "noCA": "No CA configured",
+    "noCADescription": "Create or import a CA to start issuing certificates",
+    "form": {
+      "commonName": "Common Name (CN)",
+      "organization": "Organization (O)",
+      "organizationUnit": "Organizational Unit (OU)",
+      "country": "Country (C)",
+      "state": "State (ST)",
+      "locality": "Locality (L)",
+      "email": "Email",
+      "validityDays": "Validity (days)",
+      "algorithm": "Algorithm",
+      "keySize": "Key Size",
+      "password": "CA Password",
+      "confirmPassword": "Confirm Password"
+    }
+  },
+  "certificates": {
+    "title": "Certificates",
+    "subtitle": "Issue and manage digital certificates",
+    "create": "Issue Certificate",
+    "renew": "Renew",
+    "revoke": "Revoke",
+    "export": "Export",
+    "delete": "Delete",
+    "validate": "Validate",
+    "noCerts": "No certificates issued",
+    "types": {
+      "server": "Server",
+      "client": "Client",
+      "codeSigning": "Code Signing",
+      "vpn": "VPN",
+      "email": "Email",
+      "webServer": "Web Server"
+    },
+    "status": {
+      "active": "Active",
+      "expired": "Expired",
+      "revoked": "Revoked",
+      "expiringSoon": "Expiring Soon"
+    },
+    "form": {
+      "name": "Friendly Name",
+      "type": "Certificate Type",
+      "commonName": "Common Name (CN)",
+      "hostname": "Hostname",
+      "domain": "Domain",
+      "san": "Subject Alternative Names (SAN)",
+      "ip": "IP Address",
+      "validity": "Validity (days)",
+      "algorithm": "Algorithm",
+      "addSAN": "Add SAN"
+    },
+    "export": {
+      "title": "Export Certificate",
+      "formats": {
+        "crt": "Certificate (CRT)",
+        "key": "Private Key (KEY)",
+        "pem": "PEM (cert + key)",
+        "pfx": "PKCS#12 (PFX/P12)",
+        "der": "DER (binary)",
+        "zip": "ZIP Package (all)"
+      }
+    }
+  },
+  "servers": {
+    "title": "Servers",
+    "subtitle": "Install certificates automatically",
+    "add": "Add Server",
+    "testConnection": "Test Connection",
+    "deploy": "Deploy Certificate",
+    "noServers": "No servers configured",
+    "types": {
+      "proxmox": "Proxmox VE",
+      "mikrotik": "MikroTik",
+      "truenas": "TrueNAS",
+      "nginx": "NGINX",
+      "apache": "Apache",
+      "traefik": "Traefik",
+      "docker": "Docker",
+      "windows": "Windows",
+      "linux": "Linux"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Application preferences and configuration",
+    "sections": {
+      "appearance": "Appearance",
+      "language": "Language",
+      "security": "Security",
+      "openssl": "OpenSSL",
+      "about": "About"
+    },
+    "theme": {
+      "label": "Theme",
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System"
+    },
+    "language": {
+      "label": "Language",
+      "ptBR": "Português (BR)",
+      "enUS": "English (US)"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "search": "Search...",
+    "filter": "Filter",
+    "noResults": "No results found",
+    "days": "days",
+    "version": "Version",
+    "unknown": "Unknown"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred",
+    "connectionFailed": "Connection failed",
+    "invalidCertificate": "Invalid certificate",
+    "opensslNotFound": "OpenSSL not found",
+    "caRequired": "A CA must be configured first"
+  }
+}

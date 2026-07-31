@@ -1,0 +1,57 @@
+appId: com.onlicert.manager
+productName: OnliCert Manager
+copyright: Copyright © 2024 OnliCert Manager Contributors
+
+directories:
+  output: dist-release
+  buildResources: resources
+
+npmRebuild: false
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - node_modules/**/*
+  - "!node_modules/.cache"
+  - "!**/*.map"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: dir
+      arch:
+        - x64
+  publisherName: OnliCert Manager
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: OnliCert Manager
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  category: Utility
+  maintainer: onlicert@example.com
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  category: public.app-category.utilities
+
+publish:
+  provider: github
+  owner: onlicert
+  repo: manager

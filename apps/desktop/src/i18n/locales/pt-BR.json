@@ -1,0 +1,171 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "ca": "Autoridade Certificadora",
+    "certificates": "Certificados",
+    "servers": "Servidores",
+    "settings": "Configurações",
+    "plugins": "Plugins"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Visão geral do seu ambiente de certificados",
+    "stats": {
+      "totalCerts": "Total de Certificados",
+      "totalServers": "Servidores Configurados",
+      "expiringSoon": "Expirando em Breve",
+      "caStatus": "Status da CA"
+    },
+    "caStatus": {
+      "active": "Ativa",
+      "inactive": "Inativa",
+      "none": "Nenhuma CA configurada"
+    },
+    "recentEvents": "Eventos Recentes",
+    "noEvents": "Nenhum evento registrado",
+    "expiringCerts": "Certificados Expirando"
+  },
+  "ca": {
+    "title": "Autoridade Certificadora",
+    "subtitle": "Gerencie sua CA local",
+    "create": "Criar CA",
+    "import": "Importar CA",
+    "export": "Exportar CA",
+    "backup": "Backup da CA",
+    "restore": "Restaurar Backup",
+    "changePassword": "Trocar Senha",
+    "noCA": "Nenhuma CA configurada",
+    "noCADescription": "Crie ou importe uma CA para começar a emitir certificados",
+    "form": {
+      "commonName": "Nome Comum (CN)",
+      "organization": "Organização (O)",
+      "organizationUnit": "Unidade Organizacional (OU)",
+      "country": "País (C)",
+      "state": "Estado (ST)",
+      "locality": "Cidade (L)",
+      "email": "E-mail",
+      "validityDays": "Validade (dias)",
+      "algorithm": "Algoritmo",
+      "keySize": "Tamanho da Chave",
+      "password": "Senha da CA",
+      "confirmPassword": "Confirmar Senha"
+    }
+  },
+  "certificates": {
+    "title": "Certificados",
+    "subtitle": "Emita e gerencie certificados digitais",
+    "create": "Emitir Certificado",
+    "renew": "Renovar",
+    "revoke": "Revogar",
+    "export": "Exportar",
+    "delete": "Excluir",
+    "validate": "Validar",
+    "noCerts": "Nenhum certificado emitido",
+    "types": {
+      "server": "Servidor",
+      "client": "Cliente",
+      "codeSigning": "Assinatura de Código",
+      "vpn": "VPN",
+      "email": "E-mail",
+      "webServer": "Servidor Web"
+    },
+    "status": {
+      "active": "Ativo",
+      "expired": "Expirado",
+      "revoked": "Revogado",
+      "expiringSoon": "Expirando"
+    },
+    "form": {
+      "name": "Nome Amigável",
+      "type": "Tipo de Certificado",
+      "commonName": "Nome Comum (CN)",
+      "hostname": "Hostname",
+      "domain": "Domínio",
+      "san": "Nomes Alternativos (SAN)",
+      "ip": "Endereço IP",
+      "validity": "Validade (dias)",
+      "algorithm": "Algoritmo",
+      "addSAN": "Adicionar SAN"
+    },
+    "export": {
+      "title": "Exportar Certificado",
+      "formats": {
+        "crt": "Certificado (CRT)",
+        "key": "Chave Privada (KEY)",
+        "pem": "PEM (cert + chave)",
+        "pfx": "PKCS#12 (PFX/P12)",
+        "der": "DER (binário)",
+        "zip": "Pacote ZIP (todos)"
+      }
+    }
+  },
+  "servers": {
+    "title": "Servidores",
+    "subtitle": "Instale certificados automaticamente",
+    "add": "Adicionar Servidor",
+    "testConnection": "Testar Conexão",
+    "deploy": "Instalar Certificado",
+    "noServers": "Nenhum servidor configurado",
+    "types": {
+      "proxmox": "Proxmox VE",
+      "mikrotik": "MikroTik",
+      "truenas": "TrueNAS",
+      "nginx": "NGINX",
+      "apache": "Apache",
+      "traefik": "Traefik",
+      "docker": "Docker",
+      "windows": "Windows",
+      "linux": "Linux"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Preferências e configurações do aplicativo",
+    "sections": {
+      "appearance": "Aparência",
+      "language": "Idioma",
+      "security": "Segurança",
+      "openssl": "OpenSSL",
+      "about": "Sobre"
+    },
+    "theme": {
+      "label": "Tema",
+      "dark": "Escuro",
+      "light": "Claro",
+      "system": "Sistema"
+    },
+    "language": {
+      "label": "Idioma",
+      "ptBR": "Português (BR)",
+      "enUS": "English (US)"
+    }
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "finish": "Concluir",
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "warning": "Atenção",
+    "search": "Pesquisar...",
+    "filter": "Filtrar",
+    "noResults": "Nenhum resultado encontrado",
+    "days": "dias",
+    "version": "Versão",
+    "unknown": "Desconhecido"
+  },
+  "errors": {
+    "generic": "Ocorreu um erro inesperado",
+    "connectionFailed": "Falha na conexão",
+    "invalidCertificate": "Certificado inválido",
+    "opensslNotFound": "OpenSSL não encontrado",
+    "caRequired": "Uma CA deve ser configurada primeiro"
+  }
+}
