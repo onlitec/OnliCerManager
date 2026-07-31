@@ -7,7 +7,7 @@ import path from "path";
 export default defineConfig({
   plugins: [
     react(),
-    electron({
+    (electron as any)({
       main: {
         entry: "electron/main.ts",
         vite: {

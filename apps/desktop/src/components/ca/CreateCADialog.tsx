@@ -42,7 +42,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
     confirmPassword: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!formData.name || !formData.commonName || !formData.password) {
@@ -99,7 +99,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
+        <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-4 py-2">
           {/* CA Name & CN */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -107,7 +107,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
               <Input
                 id="ca-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, name: e.target.value }); }}
                 required
               />
             </div>
@@ -116,7 +116,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
               <Input
                 id="ca-cn"
                 value={formData.commonName}
-                onChange={(e) => setFormData({ ...formData, commonName: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, commonName: e.target.value }); }}
                 required
               />
             </div>
@@ -128,7 +128,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
               <Label>{t("ca.form.algorithm")} *</Label>
               <Select
                 value={formData.algorithm}
-                onValueChange={(val) => setFormData({ ...formData, algorithm: val as CAAlgorithm })}
+                onValueChange={(val) => { setFormData({ ...formData, algorithm: val as CAAlgorithm }); }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -147,7 +147,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
                 id="ca-days"
                 type="number"
                 value={formData.validityDays}
-                onChange={(e) => setFormData({ ...formData, validityDays: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, validityDays: e.target.value }); }}
                 required
               />
             </div>
@@ -160,7 +160,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
               <Input
                 id="ca-org"
                 value={formData.organization}
-                onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, organization: e.target.value }); }}
               />
             </div>
             <div className="space-y-2">
@@ -169,7 +169,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
                 id="ca-country"
                 maxLength={2}
                 value={formData.country}
-                onChange={(e) => setFormData({ ...formData, country: e.target.value.toUpperCase() })}
+                onChange={(e) => { setFormData({ ...formData, country: e.target.value.toUpperCase() }); }}
               />
             </div>
           </div>
@@ -182,7 +182,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
                 id="ca-pass"
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, password: e.target.value }); }}
                 required
                 placeholder="Senha mestra da chave CA"
               />
@@ -193,7 +193,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
                 id="ca-confirm-pass"
                 type="password"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, confirmPassword: e.target.value }); }}
                 required
                 placeholder="Repita a senha"
               />
@@ -201,7 +201,7 @@ export function CreateCADialog({ open, onOpenChange, onSuccess }: CreateCADialog
           </div>
 
           <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+            <Button type="button" variant="outline" onClick={() => { onOpenChange(false); }} disabled={loading}>
               {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>

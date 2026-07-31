@@ -6,13 +6,12 @@ import { mkdirSync } from "fs";
 
 function getLogDir(): string {
   try {
-    if (app) {
-      return join(app.getPath("userData"), "logs");
-    }
+    // Outside a real Electron process, `app` isn't a usable API object
+    // (e.g. under Node/test runners), so getPath() throws and we fall back.
+    return join(app.getPath("userData"), "logs");
   } catch {
-    // Fallback if app.getPath is unavailable
+    return join(tmpdir(), "onlicert-logs");
   }
-  return join(tmpdir(), "onlicert-logs");
 }
 
 const logDir = getLogDir();
@@ -24,7 +23,7 @@ try {
 }
 
 export const logger = winston.createLogger({
-  level: process.env["NODE_ENV"] === "development" ? "debug" : "info",
+  level: process.env.NODE_ENV === "development" ? "debug" : "info",
   format: winston.format.combine(
     winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     winston.format.errors({ stack: true }),

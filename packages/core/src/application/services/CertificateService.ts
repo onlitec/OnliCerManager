@@ -1,7 +1,6 @@
-import type { Certificate, CertificateType, CertificateAlgorithm, CreateCertificateInput } from "../../domain/entities/Certificate";
-import type { CertificateAuthority } from "../../domain/entities/CertificateAuthority";
+import { randomUUID } from "node:crypto";
+import type { Certificate, CertificateAlgorithm, CreateCertificateInput } from "../../domain/entities/Certificate";
 import { formatSANsForOpenSSL, parseSANs } from "../../domain/value-objects/SubjectAlternativeName";
-import { getKeyUsageProfile } from "../../domain/value-objects/KeyUsage";
 import type { ICARepository } from "./CAService";
 
 export interface ICertificateRepository {
@@ -78,7 +77,10 @@ export class CertificateService {
     }
 
     // 2. Decrypt CA private key
-    const caKeyPem = caPassword ? this.infra.decrypt(ca.keyEncrypted, caPassword) : ca.keyEncrypted;
+    if (!caPassword) {
+      throw new Error("A senha da CA é obrigatória para assinar o certificado.");
+    }
+    const caKeyPem = this.infra.decrypt(ca.keyEncrypted, caPassword);
 
     // 3. Generate Leaf Private Key
     const leafKeyPem = await this.infra.generatePrivateKey({ algorithm });
@@ -118,14 +120,12 @@ export class CertificateService {
     // 8. Parse Metadata
     const meta = await this.infra.parseMetadata(certPem);
 
-    // 9. Encrypt leaf key (if password provided, or default application key)
-    const leafKeyEncrypted = password
-      ? this.infra.encrypt(leafKeyPem, password)
-      : this.infra.encrypt(leafKeyPem, "default");
+    // 9. Encrypt leaf key (dedicated password if provided, otherwise the CA password)
+    const leafKeyEncrypted = this.infra.encrypt(leafKeyPem, password ?? caPassword);
 
     const now = Math.floor(Date.now() / 1000);
     const certificate: Certificate = {
-      id: `cert-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: `cert-${randomUUID()}`,
       caId: ca.id,
       name,
       type,

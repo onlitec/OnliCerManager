@@ -8,6 +8,10 @@ import type {
 import https from "https";
 import { URL } from "url";
 
+interface ProxmoxCertInfoResponse {
+  data?: { subject?: string; notafter?: number }[];
+}
+
 export class ProxmoxPlugin implements IPlugin {
   readonly metadata: IPluginMetadata = {
     id: "proxmox",
@@ -21,16 +25,28 @@ export class ProxmoxPlugin implements IPlugin {
       { key: "node", label: "Nome do Nó (Node)", type: "text", required: true, placeholder: "pve" },
       { key: "tokenId", label: "API Token ID", type: "text", required: true, placeholder: "root@pam!onlicert" },
       { key: "secret", label: "API Token Secret", type: "password", required: true },
-      { key: "verifySsl", label: "Validar SSL da API", type: "boolean", required: false, defaultValue: false },
+      {
+        key: "verifySsl",
+        label: "Validar SSL da API",
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        hint: "Desabilitado por padrão porque o Proxmox costuma usar um certificado autoassinado. Enquanto desabilitado, o token de API trafega sem proteção contra interceptação (MITM) na rede.",
+      },
     ],
   };
 
+  /** Config comes from JSON stored in SQLite, so a stray non-string value must fall back. */
+  private static asString(value: unknown, fallback = ""): string {
+    return typeof value === "string" ? value : fallback;
+  }
+
   async testConnection(config: Record<string, unknown>): Promise<boolean> {
-    const host = String(config["host"] ?? "");
-    const port = Number(config["port"] ?? 8006);
-    const tokenId = String(config["tokenId"] ?? "");
-    const secret = String(config["secret"] ?? "");
-    const verifySsl = Boolean(config["verifySsl"] ?? false);
+    const host = ProxmoxPlugin.asString(config.host);
+    const port = Number(config.port ?? 8006);
+    const tokenId = ProxmoxPlugin.asString(config.tokenId);
+    const secret = ProxmoxPlugin.asString(config.secret);
+    const verifySsl = Boolean(config.verifySsl ?? false);
 
     const url = `https://${host}:${port}/api2/json/version`;
     const headers = { Authorization: `PVEAPIToken=${tokenId}=${secret}` };
@@ -41,12 +57,12 @@ export class ProxmoxPlugin implements IPlugin {
 
   async deploy(input: IDeployInput): Promise<IDeployResult> {
     const { certPem, keyPem, caPem, serverConfig } = input;
-    const host = String(serverConfig["host"] ?? "");
-    const port = Number(serverConfig["port"] ?? 8006);
-    const node = String(serverConfig["node"] ?? "pve");
-    const tokenId = String(serverConfig["tokenId"] ?? "");
-    const secret = String(serverConfig["secret"] ?? "");
-    const verifySsl = Boolean(serverConfig["verifySsl"] ?? false);
+    const host = ProxmoxPlugin.asString(serverConfig.host);
+    const port = Number(serverConfig.port ?? 8006);
+    const node = ProxmoxPlugin.asString(serverConfig.node, "pve");
+    const tokenId = ProxmoxPlugin.asString(serverConfig.tokenId);
+    const secret = ProxmoxPlugin.asString(serverConfig.secret);
+    const verifySsl = Boolean(serverConfig.verifySsl ?? false);
 
     // Build Full Chain PEM (cert + optional ca)
     const fullChainPem = caPem ? `${certPem.trim()}\n${caPem.trim()}\n` : certPem;
@@ -88,12 +104,12 @@ export class ProxmoxPlugin implements IPlugin {
   }
 
   async verify(config: Record<string, unknown>): Promise<IVerifyResult> {
-    const host = String(config["host"] ?? "");
-    const port = Number(config["port"] ?? 8006);
-    const node = String(config["node"] ?? "pve");
-    const tokenId = String(config["tokenId"] ?? "");
-    const secret = String(config["secret"] ?? "");
-    const verifySsl = Boolean(config["verifySsl"] ?? false);
+    const host = ProxmoxPlugin.asString(config.host);
+    const port = Number(config.port ?? 8006);
+    const node = ProxmoxPlugin.asString(config.node, "pve");
+    const tokenId = ProxmoxPlugin.asString(config.tokenId);
+    const secret = ProxmoxPlugin.asString(config.secret);
+    const verifySsl = Boolean(config.verifySsl ?? false);
 
     const url = `https://${host}:${port}/api2/json/nodes/${node}/certificates/info`;
     const headers = { Authorization: `PVEAPIToken=${tokenId}=${secret}` };
@@ -101,12 +117,12 @@ export class ProxmoxPlugin implements IPlugin {
     try {
       const res = await this.httpRequest(url, "GET", headers, undefined, verifySsl);
       if (res.statusCode === 200) {
-        const json = JSON.parse(res.body);
+        const json = JSON.parse(res.body) as ProxmoxCertInfoResponse;
         const certInfo = json.data?.[0];
         return {
           success: true,
-          subject: certInfo?.subject,
-          validTo: certInfo?.notafter,
+          ...(certInfo?.subject !== undefined ? { subject: certInfo.subject } : {}),
+          ...(certInfo?.notafter !== undefined ? { validTo: certInfo.notafter } : {}),
           message: "Certificado verificado com sucesso no Proxmox.",
         };
       }
@@ -134,14 +150,14 @@ export class ProxmoxPlugin implements IPlugin {
         },
         (res) => {
           let responseBody = "";
-          res.on("data", (chunk) => { responseBody += chunk; });
+          res.on("data", (chunk: Buffer) => { responseBody += chunk.toString("utf8"); });
           res.on("end", () => {
             resolve({ statusCode: res.statusCode ?? 500, body: responseBody });
           });
         }
       );
 
-      req.on("error", (err) => reject(err));
+      req.on("error", (err) => { reject(err); });
       if (body) req.write(body);
       req.end();
     });

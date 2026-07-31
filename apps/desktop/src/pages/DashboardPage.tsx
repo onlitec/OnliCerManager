@@ -11,7 +11,7 @@ export function DashboardPage() {
 
   const [activeCA, setActiveCA] = useState<CertificateAuthority | null>(null);
   const [stats, setStats] = useState({ total: 0, expiringSoon: 0, expired: 0 });
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     const loadDashboardData = async () => {

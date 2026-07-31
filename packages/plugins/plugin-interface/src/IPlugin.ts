@@ -48,7 +48,7 @@ export interface IConfigField {
   readonly hint?: string;
 
   /** Options for 'select' type */
-  readonly options?: Array<{ value: string; label: string }>;
+  readonly options?: { value: string; label: string }[];
 
   /** Default value */
   readonly defaultValue?: string | number | boolean;

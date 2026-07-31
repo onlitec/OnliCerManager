@@ -16,7 +16,7 @@ export function parseSANs(raw: string): SubjectAlternativeName[] {
     .filter(Boolean)
     .map((s) => {
       const colonIndex = s.indexOf(":");
-      if (colonIndex === -1) return { type: "dns" as SANType, value: s };
+      if (colonIndex === -1) return { type: "dns", value: s };
       const prefix = s.slice(0, colonIndex).toLowerCase();
       const value = s.slice(colonIndex + 1);
       const type: SANType =

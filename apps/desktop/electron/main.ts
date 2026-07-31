@@ -1,5 +1,6 @@
-import { app, BrowserWindow, shell, ipcMain, nativeTheme } from "electron";
+import { app, BrowserWindow, shell, ipcMain, nativeTheme, Menu } from "electron";
 import { join } from "path";
+import { existsSync } from "fs";
 import { setupAllIpcHandlers } from "./ipc";
 import { logger } from "./logger";
 
@@ -14,7 +15,7 @@ if (process.platform === "win32") {
 // Prevent app from being garbage collected
 let mainWindow: BrowserWindow | null = null;
 
-const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 const RENDERER_DIST = join(__dirname, "../dist");
 
 async function createWindow() {
@@ -40,7 +41,7 @@ async function createWindow() {
   // Show window when ready to prevent visual flash
   mainWindow.on("ready-to-show", () => {
     mainWindow?.show();
-    if (process.env["NODE_ENV"] === "development") {
+    if (process.env.NODE_ENV === "development") {
       mainWindow?.webContents.openDevTools();
     }
   });
@@ -69,18 +70,73 @@ ipcMain.handle("set-theme", (_event, theme: "dark" | "light" | "system") => {
   nativeTheme.themeSource = theme;
 });
 
+function createAppMenu() {
+  const isMac = process.platform === "darwin";
+
+  const template: Electron.MenuItemConstructorOptions[] = [
+    ...(isMac ? [{ role: "appMenu" as const }] : []),
+    { role: "fileMenu" as const },
+    { role: "editMenu" as const },
+    { role: "viewMenu" as const },
+    { role: "windowMenu" as const },
+    {
+      label: "Ajuda",
+      submenu: [
+        {
+          label: "Manual do Usuário (PDF)",
+          accelerator: "F1",
+          click: () => {
+            void (async () => {
+              const possiblePaths = [
+                join(__dirname, "../public/manual_onlicert_manager.pdf"),
+                join(__dirname, "../dist/manual_onlicert_manager.pdf"),
+                join(app.getAppPath(), "public/manual_onlicert_manager.pdf"),
+                join(app.getAppPath(), "dist/manual_onlicert_manager.pdf"),
+                join(process.cwd(), "apps/desktop/public/manual_onlicert_manager.pdf"),
+                join(process.cwd(), "docs/manual_onlicert_manager.pdf"),
+                join(process.cwd(), "public/manual_onlicert_manager.pdf"),
+              ];
+              const pdfPath = possiblePaths.find((p) => existsSync(p));
+              if (pdfPath) {
+                await shell.openPath(pdfPath);
+              } else {
+                logger.error("Manual PDF file not found from native menu");
+              }
+            })();
+          },
+        },
+        { type: "separator" },
+        {
+          label: "Sobre o OnliCert Manager",
+          click: () => {
+            if (mainWindow) {
+              mainWindow.webContents.send("app:open-about");
+            }
+          },
+        },
+      ],
+    },
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
+
 // App lifecycle
-app.whenReady().then(async () => {
+void app.whenReady().then(async () => {
   logger.info("App ready", { version: app.getVersion(), platform: process.platform });
 
   // Setup all IPC handlers
   setupAllIpcHandlers();
 
+  // Create native menu
+  createAppMenu();
+
   await createWindow();
 
-  app.on("activate", async () => {
+  app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      await createWindow();
+      void createWindow();
     }
   });
 });

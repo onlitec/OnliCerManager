@@ -78,7 +78,7 @@ export class X509Command {
       writeFileSync(certFile, certPem, "utf8");
       const args = ["x509", "-in", certFile, "-outform", "DER"];
       const result = await OpenSSLWrapper.runOrThrow(args);
-      return Buffer.from(result.stdout, "binary");
+      return result.stdoutBuffer;
     } finally {
       try {
         unlinkSync(certFile);

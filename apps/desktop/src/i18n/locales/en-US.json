@@ -5,7 +5,8 @@
     "certificates": "Certificates",
     "servers": "Servers",
     "settings": "Settings",
-    "plugins": "Plugins"
+    "plugins": "Plugins",
+    "help": "Help"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -106,6 +107,11 @@
     "testConnection": "Test Connection",
     "deploy": "Deploy Certificate",
     "noServers": "No servers configured",
+    "form": {
+      "name": "Server Name",
+      "type": "Server Type",
+      "testConnection": "Test Connection"
+    },
     "types": {
       "proxmox": "Proxmox VE",
       "mikrotik": "MikroTik",
@@ -167,5 +173,16 @@
     "invalidCertificate": "Invalid certificate",
     "opensslNotFound": "OpenSSL not found",
     "caRequired": "A CA must be configured first"
+  },
+  "help": {
+    "title": "Help & Documentation",
+    "subtitle": "OnliCert Manager user manual and support",
+    "userManual": "User Manual (PDF)",
+    "openPdf": "Open PDF Manual",
+    "downloadPdf": "Download PDF",
+    "about": "About OnliCert Manager",
+    "viewOnline": "View Manual",
+    "quickStart": "Quick Start",
+    "description": "Access the complete PDF manual containing step-by-step instructions for CA setup, SSL/TLS certificate issuance, multi-format export, and automated server deployment."
   }
 }

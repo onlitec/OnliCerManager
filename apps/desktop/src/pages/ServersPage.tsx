@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Server, Search, Trash2, Send, CheckCircle2, RefreshCw } from "lucide-react";
+import { Plus, Server, Search, Trash2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,7 @@ export function ServersPage() {
   const { toast } = useToast();
 
   const [servers, setServers] = useState<ServerEntity[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [deployDialogOpen, setDeployDialogOpen] = useState(false);
@@ -57,7 +57,7 @@ export function ServersPage() {
           <h1 className="text-2xl font-bold text-foreground">{t("servers.title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t("servers.subtitle")}</p>
         </div>
-        <Button size="sm" onClick={() => setAddDialogOpen(true)}>
+        <Button size="sm" onClick={() => { setAddDialogOpen(true); }}>
           <Plus className="mr-2 h-4 w-4" />
           {t("servers.add")}
         </Button>
@@ -70,7 +70,7 @@ export function ServersPage() {
           <Input
             placeholder={t("common.search")}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); }}
             className="pl-9"
           />
         </div>
@@ -80,10 +80,10 @@ export function ServersPage() {
         <Card className="flex flex-col items-center justify-center py-20 text-center">
           <Server className="h-16 w-16 text-muted-foreground/30 mb-4" />
           <h3 className="text-lg font-semibold text-foreground">{t("servers.noServers")}</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            Cadastre seu primeiro servidor Proxmox VE ou MikroTik para implantação automática.
+          <p className="text-sm text-muted-foreground mt-1 max-w-md">
+            Cadastre um servidor da biblioteca (Proxmox, MikroTik, NGINX, Apache, Traefik, Docker, TrueNAS) ou um servidor personalizado via SSH para implantação automática de certificados.
           </p>
-          <Button className="mt-6" onClick={() => setAddDialogOpen(true)}>
+          <Button className="mt-6" onClick={() => { setAddDialogOpen(true); }}>
             <Plus className="mr-2 h-4 w-4" />
             {t("servers.add")}
           </Button>

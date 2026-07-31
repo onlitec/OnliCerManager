@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, FileKey2, Search, Star, Trash2, Ban, ShieldCheck, Download, AlertTriangle } from "lucide-react";
+import { Plus, FileKey2, Search, Star, Trash2, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,7 @@ export function CertificatesPage() {
   const { toast } = useToast();
 
   const [certs, setCerts] = useState<Certificate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
@@ -95,7 +95,7 @@ export function CertificatesPage() {
           <h1 className="text-2xl font-bold text-foreground">{t("certificates.title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t("certificates.subtitle")}</p>
         </div>
-        <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+        <Button size="sm" onClick={() => { setCreateDialogOpen(true); }}>
           <Plus className="mr-2 h-4 w-4" />
           {t("certificates.create")}
         </Button>
@@ -108,7 +108,7 @@ export function CertificatesPage() {
           <Input
             placeholder={t("common.search")}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); }}
             className="pl-9"
           />
         </div>
@@ -121,7 +121,7 @@ export function CertificatesPage() {
           <p className="text-sm text-muted-foreground mt-1">
             Crie seu primeiro certificado digital assinado pela sua CA local.
           </p>
-          <Button className="mt-6" onClick={() => setCreateDialogOpen(true)}>
+          <Button className="mt-6" onClick={() => { setCreateDialogOpen(true); }}>
             <Plus className="mr-2 h-4 w-4" />
             {t("certificates.create")}
           </Button>

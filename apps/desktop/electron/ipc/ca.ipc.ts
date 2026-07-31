@@ -1,5 +1,4 @@
 import { ipcMain, app } from "electron";
-import { join } from "path";
 import {
   DatabaseConnection,
   CARepository,
@@ -9,7 +8,7 @@ import {
   X509Command,
 } from "@onlicert/infrastructure";
 import { CAService } from "@onlicert/core";
-import type { CreateCAInput } from "@onlicert/core";
+import type { CreateCAInput, ICAInfrastructure } from "@onlicert/core";
 import { logger } from "../logger";
 
 export function setupCAIpcHandlers(): void {
@@ -17,18 +16,18 @@ export function setupCAIpcHandlers(): void {
   const db = DatabaseConnection.getInstance(dataDir);
   const repository = new CARepository(db);
 
-  const infraAdapter = {
-    generatePrivateKey: (opts: any) => GenKeyCommand.generatePrivateKey(opts),
-    createSelfSignedCA: (opts: any) => ReqCommand.createSelfSignedCA(opts),
-    encrypt: (text: string, pass: string) => AES256Service.encrypt(text, pass),
-    decrypt: (text: string, pass: string) => AES256Service.decrypt(text, pass),
-    parseMetadata: (pem: string) => X509Command.parseMetadata(pem),
+  const infraAdapter: ICAInfrastructure = {
+    generatePrivateKey: GenKeyCommand.generatePrivateKey,
+    createSelfSignedCA: ReqCommand.createSelfSignedCA,
+    encrypt: AES256Service.encrypt,
+    decrypt: AES256Service.decrypt,
+    parseMetadata: X509Command.parseMetadata,
   };
 
   const caService = new CAService(repository, infraAdapter);
 
   // Get active CA
-  ipcMain.handle("ca:get", async () => {
+  ipcMain.handle("ca:get", () => {
     try {
       return caService.getActiveCA();
     } catch (error) {
@@ -51,7 +50,7 @@ export function setupCAIpcHandlers(): void {
   });
 
   // Export CA cert
-  ipcMain.handle("ca:export", async () => {
+  ipcMain.handle("ca:export", () => {
     try {
       const activeCA = caService.getActiveCA();
       if (!activeCA) throw new Error("No active CA found");

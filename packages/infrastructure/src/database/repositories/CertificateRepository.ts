@@ -52,27 +52,27 @@ export class CertificateRepository {
 
     if (filter.status) {
       conditions.push("status = @status");
-      params["status"] = filter.status;
+      params.status = filter.status;
     }
 
     if (filter.type) {
       conditions.push("type = @type");
-      params["type"] = filter.type;
+      params.type = filter.type;
     }
 
     if (filter.caId) {
       conditions.push("ca_id = @caId");
-      params["caId"] = filter.caId;
+      params.caId = filter.caId;
     }
 
     if (filter.isFavorite !== undefined) {
       conditions.push("is_favorite = @isFavorite");
-      params["isFavorite"] = filter.isFavorite ? 1 : 0;
+      params.isFavorite = filter.isFavorite ? 1 : 0;
     }
 
     if (filter.search) {
       conditions.push("(name LIKE @search OR common_name LIKE @search OR san_json LIKE @search)");
-      params["search"] = `%${filter.search}%`;
+      params.search = `%${filter.search}%`;
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";

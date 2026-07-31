@@ -54,11 +54,11 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
     setSanList(sanList.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.commonName) {
-      toast({ title: t("common.error"), description: "Preencha os campos obrigatórios.", variant: "destructive" });
+    if (!formData.name || !formData.commonName || !formData.caPassword) {
+      toast({ title: t("common.error"), description: "Preencha os campos obrigatórios, incluindo a senha da CA.", variant: "destructive" });
       return;
     }
 
@@ -73,7 +73,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
         validityDays: parseInt(formData.validityDays, 10),
         algorithm: formData.algorithm,
         organization: formData.organization || undefined,
-      }, formData.caPassword || undefined);
+      }, formData.caPassword);
 
       if (result.success) {
         toast({ title: t("common.success"), description: "Certificado digital emitido com sucesso!", variant: "success" });
@@ -102,7 +102,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
+        <form onSubmit={(e) => { void handleSubmit(e); }} className="space-y-4 py-2">
           {/* Friendly Name & Type */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -110,7 +110,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
               <Input
                 id="cert-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, name: e.target.value }); }}
                 required
               />
             </div>
@@ -118,7 +118,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
               <Label>{t("certificates.form.type")} *</Label>
               <Select
                 value={formData.type}
-                onValueChange={(val) => setFormData({ ...formData, type: val as CertificateType })}
+                onValueChange={(val) => { setFormData({ ...formData, type: val as CertificateType }); }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -142,7 +142,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
               <Input
                 id="cert-cn"
                 value={formData.commonName}
-                onChange={(e) => setFormData({ ...formData, commonName: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, commonName: e.target.value }); }}
                 placeholder="app.empresa.local ou 192.168.1.10"
                 required
               />
@@ -151,7 +151,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
               <Label>{t("certificates.form.algorithm")} *</Label>
               <Select
                 value={formData.algorithm}
-                onValueChange={(val) => setFormData({ ...formData, algorithm: val as CertificateAlgorithm })}
+                onValueChange={(val) => { setFormData({ ...formData, algorithm: val as CertificateAlgorithm }); }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -174,18 +174,19 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
                 id="cert-days"
                 type="number"
                 value={formData.validityDays}
-                onChange={(e) => setFormData({ ...formData, validityDays: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, validityDays: e.target.value }); }}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ca-pass-optional">Senha da CA (Se exigida)</Label>
+              <Label htmlFor="ca-pass-optional">Senha da CA *</Label>
               <Input
                 id="ca-pass-optional"
                 type="password"
                 value={formData.caPassword}
-                onChange={(e) => setFormData({ ...formData, caPassword: e.target.value })}
+                onChange={(e) => { setFormData({ ...formData, caPassword: e.target.value }); }}
                 placeholder="Senha mestra da chave CA"
+                required
               />
             </div>
           </div>
@@ -196,7 +197,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
             <div className="flex gap-2">
               <Input
                 value={sanInput}
-                onChange={(e) => setSanInput(e.target.value)}
+                onChange={(e) => { setSanInput(e.target.value); }}
                 placeholder="ex: app.local ou IP:192.168.1.50"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -219,7 +220,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
                   {san}
                   <button
                     type="button"
-                    onClick={() => handleRemoveSAN(index)}
+                    onClick={() => { handleRemoveSAN(index); }}
                     className="text-muted-foreground hover:text-destructive ml-1"
                   >
                     <Trash2 className="h-3 w-3" />
@@ -230,7 +231,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
           </div>
 
           <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+            <Button type="button" variant="outline" onClick={() => { onOpenChange(false); }} disabled={loading}>
               {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>

@@ -12,7 +12,7 @@ import {
   type CertFilter,
 } from "@onlicert/infrastructure";
 import { CertificateService } from "@onlicert/core";
-import type { CreateCertificateInput } from "@onlicert/core";
+import type { CreateCertificateInput, ICertificateInfrastructure } from "@onlicert/core";
 import { logger } from "../logger";
 
 export function setupCertificateIpcHandlers(): void {
@@ -21,21 +21,21 @@ export function setupCertificateIpcHandlers(): void {
   const certRepo = new CertificateRepository(db);
   const caRepo = new CARepository(db);
 
-  const infraAdapter = {
-    generatePrivateKey: (opts: any) => GenKeyCommand.generatePrivateKey(opts),
-    createCSR: (opts: any) => ReqCommand.createCSR(opts),
-    signCSR: (opts: any) => CACommand.signCSR(opts),
-    parseMetadata: (pem: string) => X509Command.parseMetadata(pem),
-    exportToPKCS12: (opts: any) => PKCS12Command.exportToPKCS12(opts),
-    pemToDer: (pem: string) => X509Command.pemToDer(pem),
-    encrypt: (text: string, pass: string) => AES256Service.encrypt(text, pass),
-    decrypt: (text: string, pass: string) => AES256Service.decrypt(text, pass),
+  const infraAdapter: ICertificateInfrastructure = {
+    generatePrivateKey: GenKeyCommand.generatePrivateKey,
+    createCSR: ReqCommand.createCSR,
+    signCSR: CACommand.signCSR,
+    parseMetadata: X509Command.parseMetadata,
+    exportToPKCS12: PKCS12Command.exportToPKCS12,
+    pemToDer: X509Command.pemToDer,
+    encrypt: AES256Service.encrypt,
+    decrypt: AES256Service.decrypt,
   };
 
   const certService = new CertificateService(certRepo, caRepo, infraAdapter);
 
   // List certificates
-  ipcMain.handle("cert:list", async (_event, filter?: CertFilter) => {
+  ipcMain.handle("cert:list", (_event, filter?: CertFilter) => {
     try {
       return certService.listCertificates(filter);
     } catch (error) {
@@ -45,7 +45,7 @@ export function setupCertificateIpcHandlers(): void {
   });
 
   // Get certificate stats
-  ipcMain.handle("cert:stats", async () => {
+  ipcMain.handle("cert:stats", () => {
     try {
       return certService.getStats();
     } catch (error) {
@@ -68,7 +68,7 @@ export function setupCertificateIpcHandlers(): void {
   });
 
   // Revoke certificate
-  ipcMain.handle("cert:revoke", async (_event, id: string) => {
+  ipcMain.handle("cert:revoke", (_event, id: string) => {
     try {
       certService.revokeCertificate(id);
       return { success: true };
@@ -79,7 +79,7 @@ export function setupCertificateIpcHandlers(): void {
   });
 
   // Toggle favorite
-  ipcMain.handle("cert:favorite", async (_event, id: string) => {
+  ipcMain.handle("cert:favorite", (_event, id: string) => {
     try {
       const isFav = certService.toggleFavorite(id);
       return { success: true, isFavorite: isFav };
@@ -90,7 +90,7 @@ export function setupCertificateIpcHandlers(): void {
   });
 
   // Delete certificate
-  ipcMain.handle("cert:delete", async (_event, id: string) => {
+  ipcMain.handle("cert:delete", (_event, id: string) => {
     try {
       const deleted = certService.deleteCertificate(id);
       return { success: deleted };

@@ -19,34 +19,34 @@ class MockDatabase {
     return {
       get(...args: any[]) {
         if (lowerSql.includes("from certificate_authorities") && lowerSql.includes("is_active = 1")) {
-          return self.tables["certificate_authorities"]?.find((ca) => ca.is_active === 1);
+          return self.tables.certificate_authorities?.find((ca) => ca.is_active === 1);
         }
         if (lowerSql.includes("from certificate_authorities") && lowerSql.includes("id = ?")) {
-          return self.tables["certificate_authorities"]?.find((ca) => ca.id === args[0]);
+          return self.tables.certificate_authorities?.find((ca) => ca.id === args[0]);
         }
         if (lowerSql.includes("from certificates") && lowerSql.includes("id = ?")) {
-          return self.tables["certificates"]?.find((c) => c.id === args[0]);
+          return self.tables.certificates?.find((c) => c.id === args[0]);
         }
         if (lowerSql.includes("from servers") && lowerSql.includes("id = ?")) {
-          return self.tables["servers"]?.find((s) => s.id === args[0]);
+          return self.tables.servers?.find((s) => s.id === args[0]);
         }
         if (lowerSql.includes("select count(*)")) {
-          return { c: self.tables["certificates"]?.length ?? 0 };
+          return { c: self.tables.certificates?.length ?? 0 };
         }
         return undefined;
       },
       all(..._args: any[]) {
         if (lowerSql.includes("from certificates")) {
-          return self.tables["certificates"] ?? [];
+          return self.tables.certificates ?? [];
         }
         if (lowerSql.includes("from servers")) {
-          return self.tables["servers"] ?? [];
+          return self.tables.servers ?? [];
         }
         return [];
       },
       run(params?: any) {
         if (lowerSql.includes("insert into certificate_authorities")) {
-          self.tables["certificate_authorities"]?.push({
+          self.tables.certificate_authorities?.push({
             id: params.id,
             name: params.name,
             common_name: params.commonName,
@@ -60,7 +60,7 @@ class MockDatabase {
             updated_at: params.updatedAt,
           });
         } else if (lowerSql.includes("insert into certificates")) {
-          self.tables["certificates"]?.push({
+          self.tables.certificates?.push({
             id: params.id,
             ca_id: params.caId,
             name: params.name,
@@ -80,7 +80,7 @@ class MockDatabase {
             updated_at: params.updatedAt,
           });
         } else if (lowerSql.includes("insert into servers")) {
-          self.tables["servers"]?.push({
+          self.tables.servers?.push({
             id: params.id,
             name: params.name,
             type: params.type,
@@ -95,10 +95,10 @@ class MockDatabase {
           });
         } else if (lowerSql.includes("delete from certificates")) {
           const id = typeof params === "string" ? params : params?.id;
-          self.tables["certificates"] = (self.tables["certificates"] ?? []).filter((c) => c.id !== id);
+          self.tables.certificates = (self.tables.certificates ?? []).filter((c) => c.id !== id);
         } else if (lowerSql.includes("delete from servers")) {
           const id = typeof params === "string" ? params : params?.id;
-          self.tables["servers"] = (self.tables["servers"] ?? []).filter((s) => s.id !== id);
+          self.tables.servers = (self.tables.servers ?? []).filter((s) => s.id !== id);
         }
         return { changes: 1 };
       },

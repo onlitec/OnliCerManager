@@ -6,7 +6,7 @@ import {
   FileKey2,
   Server,
   Settings,
-  Puzzle,
+  HelpCircle,
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -85,6 +85,26 @@ export function Sidebar() {
             <>
               <Settings className="h-4 w-4 shrink-0" />
               <span className="flex-1 truncate">{t("nav.settings")}</span>
+              {isActive && <ChevronRight className="h-3 w-3 opacity-60" />}
+            </>
+          )}
+        </NavLink>
+
+        <NavLink
+          to="/help"
+          className={({ isActive }) =>
+            cn(
+              "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
+              isActive
+                ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            )
+          }
+        >
+          {({ isActive }) => (
+            <>
+              <HelpCircle className="h-4 w-4 shrink-0" />
+              <span className="flex-1 truncate">{t("nav.help")}</span>
               {isActive && <ChevronRight className="h-3 w-3 opacity-60" />}
             </>
           )}

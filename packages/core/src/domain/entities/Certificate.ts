@@ -21,7 +21,7 @@ export interface Certificate {
   readonly name: string;
   readonly type: CertificateType;
   readonly commonName: string;
-  readonly san: ReadonlyArray<string>;
+  readonly san: readonly string[];
   readonly certPem: string;
   readonly keyEncrypted: string;
   readonly csrPem?: string;

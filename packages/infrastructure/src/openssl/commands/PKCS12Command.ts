@@ -30,7 +30,7 @@ export class PKCS12Command {
 
     try {
       writeFileSync(certFile, certPem, "utf8");
-      writeFileSync(keyFile, keyPem, "utf8");
+      writeFileSync(keyFile, keyPem, { encoding: "utf8", mode: 0o600 });
 
       const args = [
         "pkcs12",
@@ -40,11 +40,14 @@ export class PKCS12Command {
         "-inkey",
         keyFile,
         "-passout",
-        `pass:${exportPassword}`,
+        "env:ONLICERT_PFX_OUT_PASS",
       ];
 
+      const env: Record<string, string> = { ONLICERT_PFX_OUT_PASS: exportPassword };
+
       if (keyPassword) {
-        args.push("-passin", `pass:${keyPassword}`);
+        args.push("-passin", "env:ONLICERT_KEY_PASS");
+        env.ONLICERT_KEY_PASS = keyPassword;
       }
 
       if (caCertPem) {
@@ -53,8 +56,8 @@ export class PKCS12Command {
         args.push("-certfile", caFile);
       }
 
-      const result = await OpenSSLWrapper.runOrThrow(args);
-      return Buffer.from(result.stdout, "binary");
+      const result = await OpenSSLWrapper.runOrThrow(args, { env });
+      return result.stdoutBuffer;
     } finally {
       try {
         unlinkSync(certFile);

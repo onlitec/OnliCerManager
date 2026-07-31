@@ -41,10 +41,13 @@ export class GenKeyCommand {
     }
 
     if (password) {
-      args.push("-aes256", "-pass", `pass:${password}`);
+      args.push("-aes256", "-pass", "env:ONLICERT_KEY_PASS");
     }
 
-    const result = await OpenSSLWrapper.runOrThrow(args);
+    const result = await OpenSSLWrapper.runOrThrow(
+      args,
+      password ? { env: { ONLICERT_KEY_PASS: password } } : undefined
+    );
     return result.stdout;
   }
 
@@ -55,13 +58,16 @@ export class GenKeyCommand {
     const keyFile = join(tmpdir(), `pkey_extract_${Date.now()}_${Math.random().toString(36).slice(2)}.pem`);
 
     try {
-      writeFileSync(keyFile, privateKeyPem, "utf8");
+      writeFileSync(keyFile, privateKeyPem, { encoding: "utf8", mode: 0o600 });
       const args: string[] = ["pkey", "-in", keyFile, "-pubout"];
       if (password) {
-        args.push("-passin", `pass:${password}`);
+        args.push("-passin", "env:ONLICERT_KEY_PASS");
       }
 
-      const result = await OpenSSLWrapper.runOrThrow(args);
+      const result = await OpenSSLWrapper.runOrThrow(
+        args,
+        password ? { env: { ONLICERT_KEY_PASS: password } } : undefined
+      );
       return result.stdout;
     } finally {
       try {

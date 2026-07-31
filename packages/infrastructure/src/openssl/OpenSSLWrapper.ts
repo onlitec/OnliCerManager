@@ -3,6 +3,8 @@ import { OpenSSLBinary } from "./OpenSSLBinary";
 
 export interface OpenSSLResult {
   stdout: string;
+  /** Raw, undecoded stdout bytes — use for binary outputs (DER, PKCS#12) instead of `stdout`. */
+  stdoutBuffer: Buffer;
   stderr: string;
   exitCode: number;
   success: boolean;
@@ -41,10 +43,10 @@ export class OpenSSLWrapper {
         shell: false,
       });
 
-      let stdout = "";
+      const stdoutChunks: Buffer[] = [];
       let stderr = "";
 
-      child.stdout.on("data", (data: Buffer) => { stdout += data.toString(); });
+      child.stdout.on("data", (data: Buffer) => { stdoutChunks.push(data); });
       child.stderr.on("data", (data: Buffer) => { stderr += data.toString(); });
 
       if (stdin) {
@@ -60,8 +62,10 @@ export class OpenSSLWrapper {
       child.on("close", (exitCode) => {
         clearTimeout(timeout);
         const code = exitCode ?? 1;
+        const stdoutBuffer = Buffer.concat(stdoutChunks);
         resolve({
-          stdout: stdout.trim(),
+          stdout: stdoutBuffer.toString("utf8").trim(),
+          stdoutBuffer,
           stderr: stderr.trim(),
           exitCode: code,
           success: code === 0,

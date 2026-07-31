@@ -31,12 +31,12 @@ export class ReqCommand {
     let configFile: string | undefined;
 
     try {
-      writeFileSync(keyFile, privateKeyPem, "utf8");
+      writeFileSync(keyFile, privateKeyPem, { encoding: "utf8", mode: 0o600 });
 
       const args: string[] = ["req", "-new", "-subj", subject, "-key", keyFile];
 
       if (keyPassword) {
-        args.push("-passin", `pass:${keyPassword}`);
+        args.push("-passin", "env:ONLICERT_KEY_PASS");
       }
 
       if (san && san.length > 0) {
@@ -53,7 +53,10 @@ export class ReqCommand {
         args.push("-config", configFile, "-reqexts", "v3_req");
       }
 
-      const result = await OpenSSLWrapper.runOrThrow(args);
+      const result = await OpenSSLWrapper.runOrThrow(
+        args,
+        keyPassword ? { env: { ONLICERT_KEY_PASS: keyPassword } } : undefined
+      );
       return result.stdout;
     } finally {
       try {
@@ -76,7 +79,7 @@ export class ReqCommand {
     const configFile = join(tmpdir(), `openssl_ca_${Date.now()}_${Math.random().toString(36).slice(2)}.cnf`);
 
     try {
-      writeFileSync(keyFile, privateKeyPem, "utf8");
+      writeFileSync(keyFile, privateKeyPem, { encoding: "utf8", mode: 0o600 });
 
       const caConfig = [
         "[req]",
@@ -109,10 +112,13 @@ export class ReqCommand {
       ];
 
       if (keyPassword) {
-        args.push("-passin", `pass:${keyPassword}`);
+        args.push("-passin", "env:ONLICERT_KEY_PASS");
       }
 
-      const result = await OpenSSLWrapper.runOrThrow(args);
+      const result = await OpenSSLWrapper.runOrThrow(
+        args,
+        keyPassword ? { env: { ONLICERT_KEY_PASS: keyPassword } } : undefined
+      );
       return result.stdout;
     } finally {
       try {

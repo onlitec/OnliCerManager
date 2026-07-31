@@ -40,7 +40,7 @@ export function CAPage() {
       await navigator.clipboard.writeText(ca.certPem);
       setCopied(true);
       toast({ title: t("common.success"), description: "Certificado público da CA copiado para a área de transferência!", variant: "success" });
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => { setCopied(false); }, 2000);
     } catch {
       toast({ title: t("common.error"), description: "Falha ao copiar certificado", variant: "destructive" });
     }
@@ -59,7 +59,7 @@ export function CAPage() {
               <Upload className="mr-2 h-4 w-4" />
               {t("ca.import")}
             </Button>
-            <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+            <Button size="sm" onClick={() => { setCreateDialogOpen(true); }}>
               <Plus className="mr-2 h-4 w-4" />
               {t("ca.create")}
             </Button>
@@ -107,7 +107,7 @@ export function CAPage() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-medium text-muted-foreground uppercase">Certificado Público (PEM)</p>
-                  <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={handleExportCert}>
+                  <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { void handleExportCert(); }}>
                     {copied ? <Check className="mr-1 h-3.5 w-3.5 text-green-500" /> : <Copy className="mr-1 h-3.5 w-3.5" />}
                     {copied ? "Copiado" : "Copiar PEM"}
                   </Button>
@@ -126,7 +126,7 @@ export function CAPage() {
                 <CardTitle className="text-sm font-semibold">Ações da CA</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button variant="outline" className="w-full justify-start" size="sm" onClick={handleExportCert}>
+                <Button variant="outline" className="w-full justify-start" size="sm" onClick={() => { void handleExportCert(); }}>
                   <Download className="mr-2 h-4 w-4" />
                   {t("ca.export")}
                 </Button>
@@ -157,7 +157,7 @@ export function CAPage() {
               <Upload className="mr-2 h-4 w-4" />
               {t("ca.import")}
             </Button>
-            <Button onClick={() => setCreateDialogOpen(true)}>
+            <Button onClick={() => { setCreateDialogOpen(true); }}>
               <Plus className="mr-2 h-4 w-4" />
               {t("ca.create")}
             </Button>

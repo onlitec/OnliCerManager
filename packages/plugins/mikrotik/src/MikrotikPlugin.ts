@@ -20,16 +20,28 @@ export class MikrotikPlugin implements IPlugin {
       { key: "port", label: "Porta HTTPS (REST)", type: "number", required: true, defaultValue: 443 },
       { key: "username", label: "Usuário Admin", type: "text", required: true, defaultValue: "admin" },
       { key: "password", label: "Senha", type: "password", required: true },
-      { key: "verifySsl", label: "Validar SSL", type: "boolean", required: false, defaultValue: false },
+      {
+        key: "verifySsl",
+        label: "Validar SSL",
+        type: "boolean",
+        required: false,
+        defaultValue: false,
+        hint: "Desabilitado por padrão porque o RouterOS costuma usar um certificado autoassinado. Enquanto desabilitado, a senha do usuário trafega sem proteção contra interceptação (MITM) na rede.",
+      },
     ],
   };
 
+  /** Config comes from JSON stored in SQLite, so a stray non-string value must fall back. */
+  private static asString(value: unknown, fallback = ""): string {
+    return typeof value === "string" ? value : fallback;
+  }
+
   async testConnection(config: Record<string, unknown>): Promise<boolean> {
-    const host = String(config["host"] ?? "");
-    const port = Number(config["port"] ?? 443);
-    const username = String(config["username"] ?? "admin");
-    const password = String(config["password"] ?? "");
-    const verifySsl = Boolean(config["verifySsl"] ?? false);
+    const host = MikrotikPlugin.asString(config.host);
+    const port = Number(config.port ?? 443);
+    const username = MikrotikPlugin.asString(config.username, "admin");
+    const password = MikrotikPlugin.asString(config.password);
+    const verifySsl = Boolean(config.verifySsl ?? false);
 
     const url = `https://${host}:${port}/rest/system/resource`;
     const authHeader = "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
@@ -40,11 +52,11 @@ export class MikrotikPlugin implements IPlugin {
 
   async deploy(input: IDeployInput): Promise<IDeployResult> {
     const { certPem, keyPem, serverConfig } = input;
-    const host = String(serverConfig["host"] ?? "");
-    const port = Number(serverConfig["port"] ?? 443);
-    const username = String(serverConfig["username"] ?? "admin");
-    const password = String(serverConfig["password"] ?? "");
-    const verifySsl = Boolean(serverConfig["verifySsl"] ?? false);
+    const host = MikrotikPlugin.asString(serverConfig.host);
+    const port = Number(serverConfig.port ?? 443);
+    const username = MikrotikPlugin.asString(serverConfig.username, "admin");
+    const password = MikrotikPlugin.asString(serverConfig.password);
+    const verifySsl = Boolean(serverConfig.verifySsl ?? false);
 
     const authHeader = "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
 
@@ -82,11 +94,11 @@ export class MikrotikPlugin implements IPlugin {
   }
 
   async verify(config: Record<string, unknown>): Promise<IVerifyResult> {
-    const host = String(config["host"] ?? "");
-    const port = Number(config["port"] ?? 443);
-    const username = String(config["username"] ?? "admin");
-    const password = String(config["password"] ?? "");
-    const verifySsl = Boolean(config["verifySsl"] ?? false);
+    const host = MikrotikPlugin.asString(config.host);
+    const port = Number(config.port ?? 443);
+    const username = MikrotikPlugin.asString(config.username, "admin");
+    const password = MikrotikPlugin.asString(config.password);
+    const verifySsl = Boolean(config.verifySsl ?? false);
 
     const authHeader = "Basic " + Buffer.from(`${username}:${password}`).toString("base64");
     const url = `https://${host}:${port}/rest/certificate`;
@@ -120,14 +132,14 @@ export class MikrotikPlugin implements IPlugin {
         },
         (res) => {
           let responseBody = "";
-          res.on("data", (chunk) => { responseBody += chunk; });
+          res.on("data", (chunk: Buffer) => { responseBody += chunk.toString("utf8"); });
           res.on("end", () => {
             resolve({ statusCode: res.statusCode ?? 500, body: responseBody });
           });
         }
       );
 
-      req.on("error", (err) => reject(err));
+      req.on("error", (err) => { reject(err); });
       if (body) req.write(body);
       req.end();
     });

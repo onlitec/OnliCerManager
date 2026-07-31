@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Moon, Sun, Monitor, Globe, ShieldCheck, Info } from "lucide-react";
+import { Moon, Sun, Monitor, Globe, ShieldCheck, Info, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +10,18 @@ import { cn } from "@/lib/utils";
 export function SettingsPage() {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
+
+  const handleOpenPdfManual = async () => {
+    try {
+      if (window.electron) {
+        await window.electron.invoke("help:open-manual");
+      } else {
+        window.open("/manual_onlicert_manager.pdf", "_blank");
+      }
+    } catch (error) {
+      console.error("Error opening manual PDF:", error);
+    }
+  };
 
   const themes = [
     { value: "light" as const, label: t("settings.theme.light"), icon: Sun },
@@ -40,7 +52,7 @@ export function SettingsPage() {
             {themes.map(({ value, label, icon: Icon }) => (
               <button
                 key={value}
-                onClick={() => setTheme(value)}
+                onClick={() => { setTheme(value); }}
                 className={cn(
                   "flex flex-1 flex-col items-center gap-2 rounded-lg border p-3 text-sm font-medium transition-all",
                   theme === value
@@ -105,11 +117,17 @@ export function SettingsPage() {
           <p className="text-xs text-muted-foreground">
             Open Source certificate management with local CA support. Powered by OpenSSL.
           </p>
-          <Button variant="outline" size="sm" className="w-full" asChild>
-            <a href="https://github.com/onlicert/manager" target="_blank" rel="noopener noreferrer">
-              GitHub Repository
-            </a>
-          </Button>
+          <div className="flex gap-3 pt-1">
+            <Button variant="default" size="sm" className="flex-1 gap-2" onClick={() => { void handleOpenPdfManual(); }}>
+              <FileText className="h-4 w-4" />
+              {t("help.userManual")}
+            </Button>
+            <Button variant="outline" size="sm" className="flex-1" asChild>
+              <a href="https://github.com/onlicert/manager" target="_blank" rel="noopener noreferrer">
+                GitHub Repository
+              </a>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

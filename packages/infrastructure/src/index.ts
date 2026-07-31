@@ -21,3 +21,14 @@ export { AES256Service } from "./encryption/AES256Service";
 
 // Plugins
 export { PluginRegistry } from "./plugins/PluginRegistry";
+export {
+  SSHPlugin,
+  createCustomSSHPlugin,
+  createNginxPlugin,
+  createApachePlugin,
+  createTraefikPlugin,
+  createDockerPlugin,
+  createTrueNASPlugin,
+  createSambaPlugin,
+  createLinuxGenericPlugin,
+} from "./plugins/SSHPlugin";

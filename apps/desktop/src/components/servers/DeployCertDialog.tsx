@@ -121,7 +121,7 @@ export function DeployCertDialog({ open, onOpenChange, server }: DeployCertDialo
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+          <Button variant="outline" onClick={() => { onOpenChange(false); }} disabled={loading}>
             {t("common.cancel")}
           </Button>
           <Button onClick={() => void handleDeploy()} disabled={loading || !selectedCertId}>

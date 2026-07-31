@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { CertificateAuthority, CAAlgorithm, CreateCAInput } from "../../domain/entities/CertificateAuthority";
 
 export interface ICAInfrastructure {
@@ -75,7 +76,7 @@ export class CAService {
 
     const now = Math.floor(Date.now() / 1000);
     const ca: CertificateAuthority = {
-      id: `ca-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: `ca-${randomUUID()}`,
       name,
       commonName,
       certPem,

@@ -27,7 +27,7 @@ export class CACommand {
     try {
       writeFileSync(csrFile, csrPem, "utf8");
       writeFileSync(caCertFile, caCertPem, "utf8");
-      writeFileSync(caKeyFile, caKeyPem, "utf8");
+      writeFileSync(caKeyFile, caKeyPem, { encoding: "utf8", mode: 0o600 });
 
       const args = [
         "x509",
@@ -45,7 +45,7 @@ export class CACommand {
       ];
 
       if (caKeyPassword) {
-        args.push("-passin", `pass:${caKeyPassword}`);
+        args.push("-passin", "env:ONLICERT_CA_KEY_PASS");
       }
 
       if (san && san.length > 0) {
@@ -60,7 +60,10 @@ export class CACommand {
         args.push("-extfile", configFile);
       }
 
-      const result = await OpenSSLWrapper.runOrThrow(args);
+      const result = await OpenSSLWrapper.runOrThrow(
+        args,
+        caKeyPassword ? { env: { ONLICERT_CA_KEY_PASS: caKeyPassword } } : undefined
+      );
       return result.stdout;
     } finally {
       try {

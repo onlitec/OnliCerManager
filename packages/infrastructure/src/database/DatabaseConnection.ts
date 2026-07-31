@@ -2,8 +2,6 @@ import Database from "better-sqlite3";
 import { join } from "path";
 import { mkdirSync } from "fs";
 
-let db: Database.Database | null = null;
-
 /**
  * SQLite database connection singleton.
  * Manages initialization and migrations.
@@ -18,7 +16,7 @@ export class DatabaseConnection {
     const dbPath = join(dataDir, "onlicert.db");
 
     this.instance = new Database(dbPath, {
-      verbose: process.env["NODE_ENV"] === "development" ? console.log : undefined,
+      verbose: process.env.NODE_ENV === "development" ? console.log : undefined,
     });
 
     // Enable WAL mode for better concurrent performance
@@ -49,7 +47,7 @@ export class DatabaseConnection {
       .pluck()
       .all() as number[];
 
-    const migrations: Array<{ version: number; sql: string }> = [
+    const migrations: { version: number; sql: string }[] = [
       { version: 1, sql: MIGRATION_V1 },
     ];
 

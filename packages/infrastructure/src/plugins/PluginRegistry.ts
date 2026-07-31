@@ -5,9 +5,7 @@ export class PluginRegistry {
   private plugins = new Map<string, IPlugin>();
 
   static getInstance(): PluginRegistry {
-    if (!this.instance) {
-      this.instance = new PluginRegistry();
-    }
+    this.instance ??= new PluginRegistry();
     return this.instance;
   }
 

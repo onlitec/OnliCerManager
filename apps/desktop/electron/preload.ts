@@ -34,7 +34,9 @@ type IpcChannel =
   | "settings:get"
   | "settings:set"
   | "events:list"
-  | "openssl:version";
+  | "openssl:version"
+  | "help:open-manual"
+  | "help:get-manual-path";
 
 type IpcListenChannel = "deploy:progress" | "openssl:output" | "app:update-available";
 
@@ -50,7 +52,7 @@ const electronAPI = {
   off: (channel: IpcListenChannel, listener: (...args: unknown[]) => void) => {
     ipcRenderer.removeListener(channel, listener);
   },
-  platform: process.platform as NodeJS.Platform,
+  platform: process.platform,
 };
 
 contextBridge.exposeInMainWorld("electron", electronAPI);

@@ -1,5 +1,18 @@
 import { ipcMain, app } from "electron";
-import { DatabaseConnection, ServerRepository, PluginRegistry, AES256Service } from "@onlicert/infrastructure";
+import { randomUUID } from "node:crypto";
+import {
+  DatabaseConnection,
+  ServerRepository,
+  PluginRegistry,
+  createCustomSSHPlugin,
+  createNginxPlugin,
+  createApachePlugin,
+  createTraefikPlugin,
+  createDockerPlugin,
+  createTrueNASPlugin,
+  createSambaPlugin,
+  createLinuxGenericPlugin,
+} from "@onlicert/infrastructure";
 import { ProxmoxPlugin } from "@onlicert/plugin-proxmox";
 import { MikrotikPlugin } from "@onlicert/plugin-mikrotik";
 import type { Server } from "@onlicert/core";
@@ -10,18 +23,26 @@ export function setupServerIpcHandlers(): void {
   const db = DatabaseConnection.getInstance(dataDir);
   const serverRepo = new ServerRepository(db);
 
-  // Register Built-in Plugins
+  // Register Built-in & Preset Plugins
   const registry = PluginRegistry.getInstance();
   registry.register(new ProxmoxPlugin());
   registry.register(new MikrotikPlugin());
+  registry.register(createCustomSSHPlugin());
+  registry.register(createSambaPlugin());
+  registry.register(createNginxPlugin());
+  registry.register(createApachePlugin());
+  registry.register(createTraefikPlugin());
+  registry.register(createDockerPlugin());
+  registry.register(createTrueNASPlugin());
+  registry.register(createLinuxGenericPlugin());
 
   // List plugins
-  ipcMain.handle("plugin:list", async () => {
+  ipcMain.handle("plugin:list", () => {
     return registry.list();
   });
 
   // List servers
-  ipcMain.handle("server:list", async () => {
+  ipcMain.handle("server:list", () => {
     try {
       return serverRepo.list();
     } catch (error) {
@@ -31,12 +52,12 @@ export function setupServerIpcHandlers(): void {
   });
 
   // Create server
-  ipcMain.handle("server:create", async (_event, serverInput: Omit<Server, "id" | "createdAt" | "updatedAt">) => {
+  ipcMain.handle("server:create", (_event, serverInput: Omit<Server, "id" | "createdAt" | "updatedAt">) => {
     try {
       const now = Math.floor(Date.now() / 1000);
       const server: Server = {
         ...serverInput,
-        id: `srv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        id: `srv-${randomUUID()}`,
         createdAt: now,
         updatedAt: now,
       };
@@ -91,7 +112,7 @@ export function setupServerIpcHandlers(): void {
   });
 
   // Delete server
-  ipcMain.handle("server:delete", async (_event, id: string) => {
+  ipcMain.handle("server:delete", (_event, id: string) => {
     try {
       const deleted = serverRepo.delete(id);
       return { success: deleted };

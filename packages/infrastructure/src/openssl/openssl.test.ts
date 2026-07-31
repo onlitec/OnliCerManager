@@ -4,6 +4,7 @@ import { ReqCommand } from "./commands/ReqCommand";
 import { CACommand } from "./commands/CACommand";
 import { X509Command } from "./commands/X509Command";
 import { VerifyCommand } from "./commands/VerifyCommand";
+import { PKCS12Command } from "./commands/PKCS12Command";
 
 describe("OpenSSL Commands Integration", () => {
   it("should generate RSA 2048 key pair", async () => {
@@ -74,5 +75,33 @@ describe("OpenSSL Commands Integration", () => {
     // 5. Verify Certificate
     const verifyResult = await VerifyCommand.verifyCertificate(leafCert, caCert);
     expect(verifyResult.valid).toBe(true);
+  });
+
+  it("should produce valid (non-corrupted) binary DER and PKCS#12 output", async () => {
+    const key = await GenKeyCommand.generatePrivateKey({ algorithm: "RSA_2048" });
+    const cert = await ReqCommand.createSelfSignedCA({
+      privateKeyPem: key,
+      validityDays: 30,
+      dn: { commonName: "Binary Export Test" },
+    });
+
+    // DER-encoded X.509 certificates always start with the ASN.1 SEQUENCE tag (0x30).
+    // Piping OpenSSL's binary stdout through a UTF-8 string would corrupt these bytes.
+    const der = await X509Command.pemToDer(cert);
+    expect(der[0]).toBe(0x30);
+
+    // Round-trip DER back to PEM and confirm it's still a valid, parseable certificate.
+    const roundTrippedPem = await X509Command.derToPem(der);
+    const metadata = await X509Command.parseMetadata(roundTrippedPem);
+    expect(metadata.subject).toContain("Binary Export Test");
+
+    // PKCS#12 containers are also binary (DER-based) and start with the same tag.
+    const pfx = await PKCS12Command.exportToPKCS12({
+      certPem: cert,
+      keyPem: key,
+      exportPassword: "test-pfx-password",
+    });
+    expect(pfx[0]).toBe(0x30);
+    expect(pfx.length).toBeGreaterThan(100);
   });
 });
