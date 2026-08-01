@@ -78,6 +78,43 @@ export default tseslint.config(
     },
   },
   {
+    // `packages/core` is bundled into the Electron *renderer* as well as the
+    // main process. A Node built-in import here makes Rollup emit
+    // `const r = require, c = r("crypto")` into the browser bundle, which throws
+    // `ReferenceError: require is not defined` before React mounts — the window
+    // comes up completely blank. That shipped in 0.1.6.
+    files: ["packages/core/src/**/*.ts"],
+    ignores: ["packages/core/src/**/*.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["node:*"],
+              message:
+                "packages/core must stay runtime-agnostic — it is bundled into the renderer. Use a web-standard API (globalThis.crypto) or move this to packages/infrastructure.",
+            },
+          ],
+          paths: [
+            "crypto",
+            "fs",
+            "path",
+            "os",
+            "child_process",
+            "util",
+            "stream",
+            "buffer",
+          ].map((name) => ({
+            name,
+            message:
+              "packages/core must stay runtime-agnostic — it is bundled into the renderer.",
+          })),
+        },
+      ],
+    },
+  },
+  {
     ignores: [
       "**/dist/**",
       "**/build/**",

@@ -76,7 +76,7 @@ jobs:
         # Python, and OpenSSL with Git for Windows.
         run: |
           sudo apt-get update
-          sudo apt-get install -y openssl fakeroot dpkg rpm build-essential python3
+          sudo apt-get install -y openssl fakeroot dpkg rpm build-essential python3 xvfb
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -105,6 +105,13 @@ jobs:
 
       - name: Build renderer
         run: pnpm --filter desktop build:renderer
+
+      - name: Verify the renderer actually mounts
+        # A renderer that throws while loading yields a blank window and a clean
+        # exit code — packaging succeeds and the release ships broken, as 0.1.6
+        # did. This loads the built bundle in a headless Electron window and
+        # fails if nothing renders.
+        run: ${{ runner.os == 'Linux' && 'xvfb-run -a' || '' }} pnpm verify:renderer
 
       - name: Package ${{ matrix.platform }} targets
         # --publish never: artifacts are uploaded explicitly below, so a failed

@@ -24,7 +24,8 @@
     "test:e2e": "pnpm --filter desktop test:e2e",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .prettierignore",
     "clean": "pnpm -r clean && rimraf node_modules",
-    "fetch:openssl": "node scripts/fetch_openssl_windows.js"
+    "fetch:openssl": "node scripts/fetch_openssl_windows.js",
+    "verify:renderer": "node scripts/run_verify_renderer.js"
   },
   "devDependencies": {
     "@electron/rebuild": "^3.6.0",

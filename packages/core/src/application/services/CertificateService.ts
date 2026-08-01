@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { randomId } from "../../domain/services/randomId";
 import type { Certificate, CertificateAlgorithm, CreateCertificateInput } from "../../domain/entities/Certificate";
 import { ensureCommonNameInSANs, formatSANsForOpenSSL, parseSANs } from "../../domain/value-objects/SubjectAlternativeName";
 import type { ICARepository } from "./CAService";
@@ -127,7 +127,7 @@ export class CertificateService {
 
     const now = Math.floor(Date.now() / 1000);
     const certificate: Certificate = {
-      id: `cert-${randomUUID()}`,
+      id: `cert-${randomId()}`,
       caId: ca.id,
       name,
       type,
