@@ -25,12 +25,13 @@ const sandboxFlags = process.platform === "linux" ? ["--no-sandbox"] : [];
 try {
   execFileSync(
     electronBinary,
-    [
-      ...sandboxFlags,
-      path.join(repoRoot, "scripts/verify_renderer.js"),
-      path.join(desktop, "dist"),
-    ],
-    { stdio: "inherit", cwd: desktop }
+    [...sandboxFlags, path.join(repoRoot, "scripts/verify_renderer.js")],
+    {
+      stdio: "inherit",
+      cwd: desktop,
+      // Passed through the environment so Chromium flags can't shift it.
+      env: { ...process.env, ONLICERT_RENDERER_DIST: path.join(desktop, "dist") },
+    }
   );
 } catch (error) {
   process.exit(typeof error.status === "number" ? error.status : 1);

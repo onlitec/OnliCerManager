@@ -16,10 +16,16 @@ const { app, BrowserWindow } = require("electron");
 const path = require("node:path");
 const fs = require("node:fs");
 
-const rendererDist = process.argv[2];
-if (!rendererDist || !fs.existsSync(path.join(rendererDist, "index.html"))) {
-  console.error(`usage: electron ${path.basename(__filename)} <renderer-dist>`);
-  console.error("(no index.html found — build the renderer first)");
+// Read from the environment rather than argv: Electron leaves Chromium flags
+// such as --no-sandbox in process.argv, which shifts positional arguments and
+// silently makes argv[2] the wrong value.
+const rendererDist = process.env.ONLICERT_RENDERER_DIST;
+if (!rendererDist) {
+  console.error("ONLICERT_RENDERER_DIST is not set — run this via `pnpm verify:renderer`.");
+  process.exit(2);
+}
+if (!fs.existsSync(path.join(rendererDist, "index.html"))) {
+  console.error(`No index.html in ${rendererDist} — build the renderer first.`);
   process.exit(2);
 }
 
