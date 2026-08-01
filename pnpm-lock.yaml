@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@electron/rebuild':
+        specifier: ^3.6.0
+        version: 3.6.1
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.0.0
         version: 8.65.0(@typescript-eslint/parser@8.65.0(eslint@9.39.5(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.5(jiti@1.21.7))(typescript@5.9.3)

@@ -13,7 +13,7 @@
   },
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "rebuild:native": "pnpm --filter desktop exec electron-builder install-app-deps",
+    "rebuild:native": "node scripts/rebuild_native.js",
     "dev": "pnpm --filter desktop dev",
     "build": "pnpm --filter desktop build",
     "preview": "pnpm --filter desktop preview",
@@ -26,6 +26,7 @@
     "clean": "pnpm -r clean && rimraf node_modules"
   },
   "devDependencies": {
+    "@electron/rebuild": "^3.6.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",

@@ -86,7 +86,8 @@ jobs:
         # load inside Electron, which uses a different one. electron-builder
         # skips this because npmRebuild is disabled, so do it explicitly —
         # otherwise the app packages fine and then dies the first time it opens
-        # its database.
+        # its database. Rebuilds only the modules that need it; see the script
+        # for why install-app-deps can't be used here.
         run: pnpm rebuild:native
 
       - name: Generate PDF manual
