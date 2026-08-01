@@ -16,10 +16,20 @@ try {
   process.exit(2);
 }
 
+// Chromium's SUID sandbox helper isn't set up on CI runners, and Electron
+// aborts rather than silently dropping it. This flag applies to *this
+// verification process only* — the packaged app still sets `sandbox: true` in
+// its webPreferences, which is what actually protects users.
+const sandboxFlags = process.platform === "linux" ? ["--no-sandbox"] : [];
+
 try {
   execFileSync(
     electronBinary,
-    [path.join(repoRoot, "scripts/verify_renderer.js"), path.join(desktop, "dist")],
+    [
+      ...sandboxFlags,
+      path.join(repoRoot, "scripts/verify_renderer.js"),
+      path.join(desktop, "dist"),
+    ],
     { stdio: "inherit", cwd: desktop }
   );
 } catch (error) {
