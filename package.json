@@ -13,6 +13,7 @@
   },
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "rebuild:native": "pnpm --filter desktop exec electron-builder install-app-deps",
     "dev": "pnpm --filter desktop dev",
     "build": "pnpm --filter desktop build",
     "preview": "pnpm --filter desktop preview",

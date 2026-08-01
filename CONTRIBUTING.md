@@ -11,7 +11,21 @@ pnpm install
 pnpm dev
 ```
 
-Requirements: Node.js >= 20, pnpm >= 9, and OpenSSL on `PATH` (Linux/macOS — Windows uses the bundled binary). See the [Build from Source](README.md#build-from-source-development) section of the README for details.
+Requirements: Node.js >= 20, pnpm >= 9, and OpenSSL on `PATH` (Linux/macOS — Windows uses the bundled binary). See the [Build from Source](README.md#build-from-source) section of the README for details.
+
+### Native modules
+
+`better-sqlite3` ships a binary compiled for Node's ABI, but it has to load inside Electron, which uses a different one. If the two don't match, the app starts and then throws the instant it opens its database — the first thing it does. Symptom: an error mentioning `NODE_MODULE_VERSION`.
+
+Fix it with:
+
+```bash
+pnpm rebuild:native
+```
+
+This is a separate step rather than a `postinstall` hook on purpose: it compiles `cpu-features` (an optional `ssh2` dependency) along the way, which needs a full C++ toolchain — Visual Studio Build Tools on Windows, `build-essential` on Linux. Running it automatically would make `pnpm install` fail for anyone without one, so it's opt-in. You only need it if you hit the error above, or before packaging a release.
+
+The release workflow runs it on CI, then verifies the result with `scripts/verify_native_modules.js`, which loads each addon under the packaged Electron runtime and fails the build if any won't load.
 
 ## Project layout
 
