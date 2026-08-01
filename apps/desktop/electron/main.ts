@@ -1,6 +1,6 @@
 import { app, BrowserWindow, shell, ipcMain, nativeTheme, Menu } from "electron";
 import { join } from "path";
-import { existsSync } from "fs";
+import { openManual } from "./manual";
 import { setupAllIpcHandlers } from "./ipc";
 import { logger } from "./logger";
 
@@ -86,24 +86,10 @@ function createAppMenu() {
         {
           label: "Manual do Usuário (PDF)",
           accelerator: "F1",
+          // Shares openManual() with the Help menu in the UI so both go through
+          // the same asar-extraction path.
           click: () => {
-            void (async () => {
-              const possiblePaths = [
-                join(__dirname, "../public/manual_onlicert_manager.pdf"),
-                join(__dirname, "../dist/manual_onlicert_manager.pdf"),
-                join(app.getAppPath(), "public/manual_onlicert_manager.pdf"),
-                join(app.getAppPath(), "dist/manual_onlicert_manager.pdf"),
-                join(process.cwd(), "apps/desktop/public/manual_onlicert_manager.pdf"),
-                join(process.cwd(), "docs/manual_onlicert_manager.pdf"),
-                join(process.cwd(), "public/manual_onlicert_manager.pdf"),
-              ];
-              const pdfPath = possiblePaths.find((p) => existsSync(p));
-              if (pdfPath) {
-                await shell.openPath(pdfPath);
-              } else {
-                logger.error("Manual PDF file not found from native menu");
-              }
-            })();
+            void openManual();
           },
         },
         { type: "separator" },
