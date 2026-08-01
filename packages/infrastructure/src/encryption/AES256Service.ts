@@ -83,7 +83,7 @@ export class AES256Service {
    */
   static verify(encryptedBase64: string, password: string): boolean {
     try {
-      this.decrypt(encryptedBase64, password);
+      AES256Service.decrypt(encryptedBase64, password);
       return true;
     } catch {
       return false;

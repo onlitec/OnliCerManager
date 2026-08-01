@@ -39,17 +39,17 @@ export class X509Command {
       const result = await OpenSSLWrapper.runOrThrow(args);
       const output = result.stdout;
 
-      const subject = this.extractField(output, "subject=");
-      const issuer = this.extractField(output, "issuer=");
-      const serial = this.extractField(output, "serial=");
-      const notBeforeStr = this.extractField(output, "notBefore=");
-      const notAfterStr = this.extractField(output, "notAfter=");
-      const fingerprint = this.extractField(output, "SHA256 Fingerprint=");
+      const subject = X509Command.extractField(output, "subject=");
+      const issuer = X509Command.extractField(output, "issuer=");
+      const serial = X509Command.extractField(output, "serial=");
+      const notBeforeStr = X509Command.extractField(output, "notBefore=");
+      const notAfterStr = X509Command.extractField(output, "notAfter=");
+      const fingerprint = X509Command.extractField(output, "SHA256 Fingerprint=");
 
       const validFrom = notBeforeStr ? Math.floor(new Date(notBeforeStr).getTime() / 1000) : 0;
       const validTo = notAfterStr ? Math.floor(new Date(notAfterStr).getTime() / 1000) : 0;
 
-      const san = this.extractSANs(output);
+      const san = X509Command.extractSANs(output);
 
       return {
         subject,

@@ -22,15 +22,18 @@ export function setupCertificateIpcHandlers(): void {
   const certRepo = new CertificateRepository(db);
   const caRepo = new CARepository(db);
 
+  // Wrapped rather than passed as bare references: a bare `X509Command.parseMetadata`
+  // is detached from its class, so any `this` inside it resolves to undefined and
+  // the call fails at runtime with "this.<helper> is not a function".
   const infraAdapter: ICertificateInfrastructure = {
-    generatePrivateKey: GenKeyCommand.generatePrivateKey,
-    createCSR: ReqCommand.createCSR,
-    signCSR: CACommand.signCSR,
-    parseMetadata: X509Command.parseMetadata,
-    exportToPKCS12: PKCS12Command.exportToPKCS12,
-    pemToDer: X509Command.pemToDer,
-    encrypt: AES256Service.encrypt,
-    decrypt: AES256Service.decrypt,
+    generatePrivateKey: (input) => GenKeyCommand.generatePrivateKey(input),
+    createCSR: (input) => ReqCommand.createCSR(input),
+    signCSR: (input) => CACommand.signCSR(input),
+    parseMetadata: (certPem) => X509Command.parseMetadata(certPem),
+    exportToPKCS12: (input) => PKCS12Command.exportToPKCS12(input),
+    pemToDer: (certPem) => X509Command.pemToDer(certPem),
+    encrypt: (plaintext, password) => AES256Service.encrypt(plaintext, password),
+    decrypt: (payload, password) => AES256Service.decrypt(payload, password),
   };
 
   const certService = new CertificateService(certRepo, caRepo, infraAdapter);

@@ -17,12 +17,13 @@ export function setupCAIpcHandlers(): void {
   const db = DatabaseConnection.getInstance(dataDir);
   const repository = new CARepository(db);
 
+  // Wrapped rather than passed as bare references — see certificates.ipc.ts.
   const infraAdapter: ICAInfrastructure = {
-    generatePrivateKey: GenKeyCommand.generatePrivateKey,
-    createSelfSignedCA: ReqCommand.createSelfSignedCA,
-    encrypt: AES256Service.encrypt,
-    decrypt: AES256Service.decrypt,
-    parseMetadata: X509Command.parseMetadata,
+    generatePrivateKey: (input) => GenKeyCommand.generatePrivateKey(input),
+    createSelfSignedCA: (input) => ReqCommand.createSelfSignedCA(input),
+    encrypt: (plaintext, password) => AES256Service.encrypt(plaintext, password),
+    decrypt: (payload, password) => AES256Service.decrypt(payload, password),
+    parseMetadata: (certPem) => X509Command.parseMetadata(certPem),
   };
 
   const caService = new CAService(repository, infraAdapter);

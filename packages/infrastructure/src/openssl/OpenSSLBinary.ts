@@ -14,20 +14,20 @@ export class OpenSSLBinary {
   private static _usingBundled = false;
 
   static resolve(): string {
-    if (this._resolvedPath) return this._resolvedPath;
+    if (OpenSSLBinary._resolvedPath) return OpenSSLBinary._resolvedPath;
 
     // 1. Try bundled binary (for Windows distribution)
-    const bundledPath = this.getBundledPath();
+    const bundledPath = OpenSSLBinary.getBundledPath();
     if (bundledPath && existsSync(bundledPath)) {
-      this._resolvedPath = bundledPath;
-      this._usingBundled = true;
+      OpenSSLBinary._resolvedPath = bundledPath;
+      OpenSSLBinary._usingBundled = true;
       return bundledPath;
     }
 
     // 2. Try system PATH
-    const systemPath = this.getSystemPath();
+    const systemPath = OpenSSLBinary.getSystemPath();
     if (systemPath) {
-      this._resolvedPath = systemPath;
+      OpenSSLBinary._resolvedPath = systemPath;
       return systemPath;
     }
 
@@ -53,7 +53,7 @@ export class OpenSSLBinary {
   }
 
   private static getBundledPath(): string | null {
-    const dir = this.getBundledDir();
+    const dir = OpenSSLBinary.getBundledDir();
     return dir ? join(dir, "openssl.exe") : null;
   }
 
@@ -69,10 +69,10 @@ export class OpenSSLBinary {
    */
   static getBundledConfigPath(): string | null {
     // resolve() sets _usingBundled; call it first so the answer is consistent.
-    this.resolve();
-    if (!this._usingBundled) return null;
+    OpenSSLBinary.resolve();
+    if (!OpenSSLBinary._usingBundled) return null;
 
-    const dir = this.getBundledDir();
+    const dir = OpenSSLBinary.getBundledDir();
     if (!dir) return null;
 
     const config = join(dir, "openssl.cnf");
@@ -96,7 +96,7 @@ export class OpenSSLBinary {
   }
 
   static async getVersion(): Promise<string> {
-    const binary = this.resolve();
+    const binary = OpenSSLBinary.resolve();
     const { execFile } = await import("child_process");
     const { promisify } = await import("util");
     const execFileAsync = promisify(execFile);

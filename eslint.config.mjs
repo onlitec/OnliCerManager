@@ -42,7 +42,13 @@ export default tseslint.config(
       "@typescript-eslint/no-extraneous-class": "off",
       // Static methods referenced by class name (e.g. `GenKeyCommand.generatePrivateKey`,
       // used directly as adapter implementations) don't carry an instance `this`.
-      "@typescript-eslint/unbound-method": ["error", { ignoreStatic: true }],
+      // Do NOT re-add `ignoreStatic: true`. It was set here once, and in the same
+      // commit an IPC adapter started passing `X509Command.parseMetadata` as a
+      // bare reference — detaching it from its class, so `this.extractField`
+      // inside it blew up at runtime. Certificate issuance was broken in a
+      // shipped release and neither typecheck nor lint said a word. Static
+      // methods are exactly the case this rule needs to cover.
+      "@typescript-eslint/unbound-method": "error",
       // The codebase deliberately uses `||` to collapse both "" and undefined
       // to a fallback (optional form fields, default error messages) — `??`
       // would stop treating an empty string as "absent" and change behavior.
