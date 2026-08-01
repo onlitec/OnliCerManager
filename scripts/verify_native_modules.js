@@ -41,7 +41,12 @@ for (const relative of addons) {
     console.log(`ok       ${path.basename(relative)}`);
   } catch (error) {
     console.error(`FAILED   ${relative}`);
-    console.error(`         ${error.message.split("\n")[0]}`);
+    // Print the whole message: the ABI mismatch explanation ("compiled against
+    // a different Node.js version using NODE_MODULE_VERSION ...") is on the
+    // continuation lines, so truncating to the first line hides the cause.
+    for (const line of String(error.message).split("\n")) {
+      console.error(`         ${line}`);
+    }
     failed++;
   }
 }

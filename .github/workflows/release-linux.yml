@@ -43,14 +43,24 @@ jobs:
           cache: "pnpm"
 
       - name: Install system dependencies
-        # openssl is a runtime dependency of the app itself; the rest are needed
-        # by electron-builder to assemble the .deb and AppImage.
+        # openssl is a runtime dependency of the app itself; fakeroot/dpkg/rpm
+        # let electron-builder assemble the .deb and AppImage; build-essential
+        # and python3 are needed by node-gyp when better-sqlite3 has to be
+        # compiled from source for Electron's ABI.
         run: |
           sudo apt-get update
-          sudo apt-get install -y openssl fakeroot dpkg rpm
+          sudo apt-get install -y openssl fakeroot dpkg rpm build-essential python3
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Rebuild native modules against Electron
+        # better-sqlite3 installs a binary built for the Node ABI (115 for
+        # Node 20), but it has to load inside Electron 33, which is ABI 130.
+        # electron-builder skips this because npmRebuild is disabled, so do it
+        # explicitly — otherwise the app packages fine and then dies the first
+        # time it opens its database.
+        run: pnpm --filter desktop exec electron-builder install-app-deps
 
       - name: Generate PDF manual
         run: node apps/desktop/scripts/generate_pdf_manual.js
