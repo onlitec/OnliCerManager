@@ -1,0 +1,105 @@
+name: Release (Linux)
+
+# Builds the Linux packages and attaches them to the GitHub release for the tag.
+# Linux artifacts are produced here rather than locally because the project is
+# developed on Windows and electron-builder cannot cross-build a .deb/AppImage
+# from there.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to build and upload to (e.g. v0.1.2)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    name: Build AppImage & .deb
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve target tag
+        id: target
+        run: echo "tag=${{ inputs.tag || github.ref_name }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.target.outputs.tag }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install system dependencies
+        # openssl is a runtime dependency of the app itself; the rest are needed
+        # by electron-builder to assemble the .deb and AppImage.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssl fakeroot dpkg rpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate PDF manual
+        run: node apps/desktop/scripts/generate_pdf_manual.js
+
+      - name: Compile Electron main process
+        run: pnpm --filter desktop build:electron
+
+      - name: Build renderer
+        run: pnpm --filter desktop build:renderer
+
+      - name: Package Linux targets
+        # --publish never: artifacts are uploaded explicitly below, so a failed
+        # smoke test can still stop them from reaching the release.
+        run: pnpm --filter desktop exec electron-builder --linux --publish never
+
+      - name: Verify native modules load under Electron
+        run: |
+          ELECTRON_RUN_AS_NODE=1 \
+            "apps/desktop/dist-release/linux-unpacked/onlicert-manager" \
+            scripts/verify_native_modules.js \
+            "apps/desktop/dist-release/linux-unpacked"
+
+      - name: List artifacts
+        run: ls -lh apps/desktop/dist-release/*.AppImage apps/desktop/dist-release/*.deb
+
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.target.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          # A tag push runs this workflow immediately, which can beat the
+          # release being created by hand — so create it if it isn't there.
+          gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1 \
+            || gh release create "$TAG" --repo "$REPO" --title "OnliCert Manager $TAG" --generate-notes
+
+          gh release upload "$TAG" \
+            apps/desktop/dist-release/*.AppImage \
+            apps/desktop/dist-release/*.deb \
+            --repo "$REPO" \
+            --clobber
+
+      - name: Keep artifacts on the workflow run too
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages
+          path: |
+            apps/desktop/dist-release/*.AppImage
+            apps/desktop/dist-release/*.deb
+          if-no-files-found: error

@@ -98,42 +98,33 @@ The installer and portable build both run on Windows Server exactly as on Window
 
 ### Linux
 
-There's no pre-built Linux package yet — build the `.AppImage` and `.deb` from source. You only need to do this once per version.
+Two formats are published for every release, both x86-64:
 
-**1. Install prerequisites**
+| File | What it is | When to use it |
+|------|------------|-----------------|
+| `OnliCert-Manager-<version>.AppImage` | Self-contained binary | Any distro; no installation, no root |
+| `onlicert-manager_<version>_amd64.deb` | Debian package | Debian, Ubuntu, Mint — integrates with your package manager |
 
-```bash
-# Debian / Ubuntu
-sudo apt install openssl build-essential python3
-```
-
-`build-essential` and `python3` are needed by `node-gyp` to compile this app's native modules (`better-sqlite3`, `ssh2`). You'll also need [Node.js](https://nodejs.org/) >= 20 and [pnpm](https://pnpm.io/installation) >= 9.
-
-**2. Clone and build**
+**AppImage**
 
 ```bash
-git clone https://github.com/onlitec/OnliCerManager.git
-cd OnliCerManager
-pnpm install
-pnpm --filter desktop build
+chmod +x OnliCert-Manager-*.AppImage
+./OnliCert-Manager-*.AppImage
 ```
 
-This packages the app with `electron-builder` for your host platform, producing an `.AppImage` and a `.deb` in `apps/desktop/dist-release/`.
+> AppImages need FUSE. On Ubuntu 22.04+ and other recent distros: `sudo apt install libfuse2` (`libfuse2t64` on newer Ubuntu). To skip FUSE entirely, run it as `./OnliCert-Manager-*.AppImage --appimage-extract-and-run`.
 
-**3. Install or run**
+**Debian package**
 
 ```bash
-# AppImage — make it executable and run it
-chmod +x apps/desktop/dist-release/*.AppImage
-./apps/desktop/dist-release/*.AppImage
-
-# .deb — install system-wide
-sudo apt install ./apps/desktop/dist-release/*.deb
+sudo apt install ./onlicert-manager_*_amd64.deb
 ```
 
-> On recent distros (Ubuntu 22.04+, Fedora, …) AppImages need `libfuse2`: `sudo apt install libfuse2` (or `libfuse2t64` on newer Ubuntu). To skip FUSE entirely, run it as `./OnliCert*.AppImage --appimage-extract-and-run`.
+`apt` pulls in the dependencies, including `openssl` — which the app invokes directly, so it must be present. Afterwards, launch **OnliCert Manager** from your application menu, or run `onlicert-manager` from a terminal.
 
-Afterwards, launch **OnliCert Manager** from your application menu or run the binary directly.
+To uninstall: `sudo apt remove onlicert-manager`.
+
+> Not on x86-64 (e.g. a Raspberry Pi or an ARM server)? No ARM build is published — [build from source](#build-from-source) instead; `pnpm --filter desktop build` packages for whatever architecture it runs on.
 
 ### Verifying a release
 
@@ -182,6 +173,8 @@ Everything is local — no cloud account, no telemetry. The SQLite database and 
 |---|---|
 | Windows | `%APPDATA%\OnliCert Manager\` |
 | Linux | `~/.config/OnliCert Manager/` |
+
+This is the same folder for the AppImage, the `.deb` and the portable build, so switching between them keeps your CA and certificates.
 
 Inside you'll find `onlicert.db` (the database) and `logs/` — check the logs first if something misbehaves.
 

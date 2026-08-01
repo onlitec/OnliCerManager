@@ -27,7 +27,8 @@ async function createWindow() {
     titleBarStyle: process.platform === "darwin" ? "hiddenInset" : "default",
     show: false,
     backgroundColor: "#0f0f0f",
-    icon: join(__dirname, "../public/icon.png"),
+    // Vite copies public/ into dist/, which is what ships in the packaged app.
+    icon: join(RENDERER_DIST, "icon.png"),
     webPreferences: {
       preload: join(__dirname, "preload.js"),
       nodeIntegration: false,

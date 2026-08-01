@@ -1,6 +1,6 @@
 {
   "name": "onlicert-manager",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Professional certificate management application with local CA support",
   "author": {

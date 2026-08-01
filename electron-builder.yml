@@ -41,7 +41,39 @@ linux:
       arch:
         - x64
   category: Utility
-  maintainer: onlicert@example.com
+  # Pinned so scripts and .desktop entries don't depend on how electron-builder
+  # happens to sanitise the product name.
+  executableName: onlicert-manager
+  maintainer: OnliCert Manager Contributors <galvatec@gmail.com>
+  vendor: OnliCert Manager Contributors
+  synopsis: Local Certificate Authority and TLS certificate manager
+  description: |
+    Create a local Certificate Authority, issue TLS certificates for your
+    internal services, and deploy them to Proxmox, MikroTik, NGINX, Apache,
+    Traefik, Docker, TrueNAS, Samba or any SSH host. All cryptography is
+    delegated to the OpenSSL binary; private keys are stored AES-256-GCM
+    encrypted. Everything runs locally, with no cloud service or account.
+  desktop:
+    entry:
+      Name: OnliCert Manager
+      Comment: Manage a local Certificate Authority and TLS certificates
+      Categories: Utility;Network;Security;
+      Keywords: certificate;ssl;tls;openssl;ca;pki;
+
+deb:
+  # OpenSSL is invoked as an external binary, so it is a hard runtime dependency.
+  depends:
+    - openssl
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libdrm2
+    - libgbm1
+    - libxcb-dri3-0
 
 mac:
   target:
