@@ -1,6 +1,6 @@
 {
   "name": "@onlicert/desktop",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "description": "OnliCert Manager Desktop Application",
   "main": "dist-electron/main.js",
