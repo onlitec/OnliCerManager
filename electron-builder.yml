@@ -20,10 +20,17 @@ win:
     - target: nsis
       arch:
         - x64
+    # Produces the portable archive as part of the build, instead of zipping
+    # win-unpacked by hand afterwards.
+    - target: zip
+      arch:
+        - x64
     - target: dir
       arch:
         - x64
   publisherName: OnliCert Manager
+  # Applies to the zip target; nsis overrides it below.
+  artifactName: OnliCert-Manager-${version}-win-portable.${ext}
 
 nsis:
   oneClick: false
@@ -31,6 +38,10 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: OnliCert Manager
+  # Without this the installer is "OnliCert Manager Setup 0.1.2.exe", and GitHub
+  # rewrites the spaces to dots on upload — so the published filename never
+  # matched either the docs or the name recorded inside latest.yml.
+  artifactName: OnliCert-Manager-Setup-${version}.${ext}
 
 linux:
   target:

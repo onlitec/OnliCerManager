@@ -29,10 +29,16 @@ export class OpenSSLBinary {
       return systemPath;
     }
 
-    throw new Error(
-      "OpenSSL binary not found. Please install OpenSSL on your system. " +
-      "On Ubuntu/Debian: sudo apt install openssl | On RHEL/Fedora: sudo dnf install openssl"
-    );
+    // Tailor the hint to the platform the user is actually on — a Windows user
+    // being told to run `apt install` has no idea what to do next.
+    const hint =
+      process.platform === "win32"
+        ? 'Install it with "winget install ShiningLight.OpenSSL.Light", or install Git for Windows (which includes OpenSSL), then reopen the app.'
+        : process.platform === "darwin"
+          ? 'Install it with "brew install openssl".'
+          : 'On Ubuntu/Debian: "sudo apt install openssl". On RHEL/Fedora: "sudo dnf install openssl".';
+
+    throw new Error(`OpenSSL não foi encontrado neste computador. ${hint}`);
   }
 
   private static getBundledPath(): string | null {

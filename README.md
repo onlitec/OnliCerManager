@@ -59,19 +59,31 @@ Pre-built binaries are published on the [Releases page](https://github.com/onlit
 
 > **Note:** builds are not code-signed yet. Windows SmartScreen and some Linux tools may warn that the publisher is unverified — this is expected for an unsigned open-source build, not a sign of tampering. See [Verifying a release](#verifying-a-release) if you want to check what you downloaded.
 
+### Prerequisite: OpenSSL
+
+**OpenSSL must be installed and on your `PATH`.** All cryptography is delegated to the real OpenSSL binary rather than reimplemented, so without it the app opens but fails as soon as you try to create a CA.
+
+| Platform | How to get it |
+|---|---|
+| Debian / Ubuntu | `sudo apt install openssl` — the `.deb` pulls it in automatically |
+| Fedora / RHEL | `sudo dnf install openssl` |
+| Windows | Not included with Windows. Install it with `winget install ShiningLight.OpenSSL.Light`, or via [Git for Windows](https://git-scm.com/download/win), which bundles one — then confirm with `openssl version` in a new terminal |
+
+On Windows the app also checks `C:\Program Files\OpenSSL-Win64\bin\openssl.exe`, the default location of the Shining Light installer, so that works even if it isn't on `PATH`.
+
 ### Windows 10 / 11
 
 Two formats are published for every release:
 
 | File | What it is | When to use it |
 |------|------------|-----------------|
-| `OnliCert.Manager.Setup.<version>.exe` | Full installer (NSIS) | Normal desktop install, with shortcuts and an uninstaller |
+| `OnliCert-Manager-Setup-<version>.exe` | Full installer (NSIS) | Normal desktop install, with shortcuts and an uninstaller |
 | `OnliCert-Manager-<version>-win-portable.zip` | Portable build | No install or admin rights needed; run from a USB drive |
 
 <details>
 <summary><b>Installer — step by step</b></summary>
 
-1. Download `OnliCert.Manager.Setup.<version>.exe` from [Releases](https://github.com/onlitec/OnliCerManager/releases).
+1. Download `OnliCert-Manager-Setup-<version>.exe` from [Releases](https://github.com/onlitec/OnliCerManager/releases).
 2. Run it. If Windows SmartScreen shows *"Windows protected your PC"*, click **More info → Run anyway** (this is because the binary isn't code-signed, not a malware detection).
 3. The installer lets you pick the install directory and creates Desktop and Start Menu shortcuts named **OnliCert Manager**. It is not a silent/one-click installer, so you'll see each step.
 4. Launch it from the Start Menu or the Desktop shortcut.
@@ -218,7 +230,7 @@ Found a security issue? Please open an issue — or, for anything sensitive, con
 
 ## Build from Source
 
-Requires [Node.js](https://nodejs.org/) >= 20, [pnpm](https://pnpm.io/) >= 9, and OpenSSL on `PATH` (bundled automatically on Windows).
+Requires [Node.js](https://nodejs.org/) >= 20, [pnpm](https://pnpm.io/) >= 9, and OpenSSL on `PATH`.
 
 ```bash
 git clone https://github.com/onlitec/OnliCerManager.git
@@ -257,7 +269,7 @@ packages/
   plugins/
     plugin-interface/      the IPlugin contract
     proxmox/  mikrotik/    API-based deployment plugins
-resources/openssl/win32/   OpenSSL binary bundled for Windows
+scripts/                   icon generation, packaged-build smoke test
 docs/                      user manual (PDF)
 ```
 
@@ -268,7 +280,7 @@ docs/                      user manual (PDF)
 | UI | React 19, TypeScript, Vite, TailwindCSS, Radix UI |
 | Desktop shell | Electron 33 |
 | Database | SQLite (`better-sqlite3`, WAL mode) |
-| Cryptography | OpenSSL CLI (bundled on Windows) |
+| Cryptography | OpenSSL CLI (system-installed) |
 | Remote access | `ssh2`, `ssh2-sftp-client` |
 | Logging | Winston |
 | Tests | Vitest |

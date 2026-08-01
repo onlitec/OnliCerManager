@@ -38,7 +38,7 @@ cd packages/infrastructure && pnpm vitest run -t "encrypts and decrypts"
 
 `apps/desktop` also has `test:e2e` (`playwright test`) in `package.json`, but no Playwright config currently exists in the repo — treat e2e as not yet wired up rather than assuming it runs.
 
-Infrastructure package tests spawn the real OpenSSL binary (see `openssl.test.ts`, `database.test.ts`) — OpenSSL must be installed and on PATH (CI installs it via `apt-get install openssl` on Linux; Windows dev relies on the bundled/system binary resolved by `OpenSSLBinary`).
+Infrastructure package tests spawn the real OpenSSL binary (see `openssl.test.ts`, `database.test.ts`) — OpenSSL must be installed and on PATH on every platform (CI installs it via `apt-get install openssl` on Linux; on Windows it comes from Git for Windows or a separate install).
 
 CI (`.github/workflows/ci.yml`) runs, in order: lint+typecheck → unit tests → build (renderer + electron compile) on ubuntu and windows. Match this locally before pushing.
 
@@ -67,7 +67,7 @@ Dependency direction: `plugins/* → plugin-interface`, `infrastructure → core
 
 ### OpenSSL wrapper (`packages/infrastructure/src/openssl`)
 
-- `OpenSSLBinary.resolve()` finds the binary: bundled `resources/openssl/win32/openssl.exe` first on Windows, then system PATH (`openssl`/known install locations) on Linux/macOS/fallback.
+- `OpenSSLBinary.resolve()` looks for a bundled `<resourcesPath>/openssl/win32/openssl.exe` on Windows first, then falls back to the system PATH (`openssl`/known install locations). **No OpenSSL is actually bundled** — nothing populates that path and `resources/openssl` is gitignored — so in practice every platform uses the system binary, and OpenSSL is a hard runtime prerequisite on Windows too. Either keep the docs saying so, or start shipping a binary; don't reintroduce the claim that one is bundled.
 - `OpenSSLWrapper.run()`/`runOrThrow()` always `spawn()` with `shell: false` and an explicit args array — never build a shell command string. Preserve this when adding new OpenSSL operations.
 - `commands/*Command.ts` (`GenKeyCommand`, `ReqCommand`, `X509Command`, `CACommand`, `VerifyCommand`, `PKCS12Command`) wrap specific OpenSSL subcommands and are the layer application services call into — don't call `OpenSSLWrapper` directly from application/UI code, add a `*Command` instead.
 
