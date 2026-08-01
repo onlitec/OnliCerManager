@@ -1,4 +1,8 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+/*
+ * No remote @import here on purpose: OnliCert Manager is an offline-first app that
+ * must work on air-gapped machines. Fetching webfonts from a CDN would stall the
+ * first paint until the request times out. We use the platform UI font stack instead.
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -65,14 +69,20 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: "Inter", system-ui, sans-serif;
+    font-family:
+      "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, "Inter",
+      system-ui, "Ubuntu", "Cantarell", "Noto Sans", sans-serif;
+    /* Tabular figures keep stat counters from shifting as they update */
+    font-feature-settings: "cv11", "ss01";
   }
 
   code,
   pre,
   kbd,
   samp {
-    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-family:
+      "Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Fira Code", "SF Mono", Consolas,
+      "Liberation Mono", "Courier New", monospace;
   }
 
   /* Custom scrollbar */

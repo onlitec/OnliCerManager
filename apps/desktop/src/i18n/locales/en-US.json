@@ -22,9 +22,15 @@
       "inactive": "Inactive",
       "none": "No CA configured"
     },
-    "recentEvents": "Recent Events",
-    "noEvents": "No events recorded",
-    "expiringCerts": "Expiring Certificates"
+    "recentCerts": "Recent Certificates",
+    "noRecentCerts": "No certificates issued yet",
+    "expiringCerts": "Expiring Certificates",
+    "noExpiringCerts": "No certificates expire in the next 30 days",
+    "expiresInDays_one": "Expires in {{count}} day",
+    "expiresInDays_other": "Expires in {{count}} days",
+    "expiredDaysAgo_one": "Expired {{count}} day ago",
+    "expiredDaysAgo_other": "Expired {{count}} days ago",
+    "viewAll": "View all"
   },
   "ca": {
     "title": "Certificate Authority",
@@ -37,6 +43,17 @@
     "changePassword": "Change Password",
     "noCA": "No CA configured",
     "noCADescription": "Create or import a CA to start issuing certificates",
+    "actions": "CA Actions",
+    "caId": "CA ID",
+    "publicCert": "Public Certificate (PEM)",
+    "copyPem": "Copy PEM",
+    "copied": "Copied",
+    "validUntil": "Valid until {{date}}",
+    "exportHint": "Save the .crt file and install it on client machines so they trust the certificates issued by this CA.",
+    "exportSuccess": "CA certificate saved to: {{path}}",
+    "copySuccess": "CA public certificate copied to the clipboard.",
+    "copyError": "Failed to copy the certificate.",
+    "featureUnavailable": "Not available in this version yet.",
     "form": {
       "commonName": "Common Name (CN)",
       "organization": "Organization (O)",
@@ -62,6 +79,28 @@
     "delete": "Delete",
     "validate": "Validate",
     "noCerts": "No certificates issued",
+    "noCertsDescription": "Issue your first digital certificate signed by your local CA.",
+    "count_one": "{{count}} certificate",
+    "count_other": "{{count}} certificates",
+    "favorite": "Mark as favorite",
+    "unfavorite": "Remove from favorites",
+    "expiringInDays": "Expiring in {{count}}d",
+    "activeForDays": "Active ({{count}}d)",
+    "validUntil": "Valid until {{date}}",
+    "confirmRevoke": {
+      "title": "Revoke this certificate?",
+      "description": "Certificate \"{{name}}\" will no longer be considered valid. This cannot be undone — you'll need to issue a new certificate to serve that host again.",
+      "action": "Revoke"
+    },
+    "confirmDelete": {
+      "title": "Delete this certificate?",
+      "description": "Certificate \"{{name}}\" and its private key will be permanently removed from this computer. This cannot be undone.",
+      "action": "Delete"
+    },
+    "revokeSuccess": "Certificate revoked successfully.",
+    "revokeError": "Failed to revoke the certificate.",
+    "deleteSuccess": "Certificate deleted.",
+    "exportSuccess": "Certificate saved to: {{path}}",
     "types": {
       "server": "Server",
       "client": "Client",
@@ -106,7 +145,16 @@
     "add": "Add Server",
     "testConnection": "Test Connection",
     "deploy": "Deploy Certificate",
+    "deployShort": "Deploy",
     "noServers": "No servers configured",
+    "noServersDescription": "Register a server from the library (Proxmox, MikroTik, NGINX, Apache, Traefik, Docker, TrueNAS) or a custom SSH server to deploy certificates automatically.",
+    "delete": "Delete server",
+    "confirmDelete": {
+      "title": "Delete this server?",
+      "description": "Server \"{{name}}\" and its stored credentials will be removed. Certificates already deployed to it are not affected.",
+      "action": "Delete"
+    },
+    "deleteSuccess": "Server deleted.",
     "form": {
       "name": "Server Name",
       "type": "Server Type",
@@ -163,9 +211,19 @@
     "search": "Search...",
     "filter": "Filter",
     "noResults": "No results found",
+    "noResultsFor": "Nothing found for \"{{query}}\"",
+    "noResultsHint": "Check the spelling or clear the search to see every item.",
+    "clearSearch": "Clear search",
+    "export": "Export",
+    "copy": "Copy",
     "days": "days",
     "version": "Version",
     "unknown": "Unknown"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist.",
+    "backHome": "Go to Dashboard"
   },
   "errors": {
     "generic": "An unexpected error occurred",

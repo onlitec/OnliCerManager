@@ -22,9 +22,15 @@
       "inactive": "Inativa",
       "none": "Nenhuma CA configurada"
     },
-    "recentEvents": "Eventos Recentes",
-    "noEvents": "Nenhum evento registrado",
-    "expiringCerts": "Certificados Expirando"
+    "recentCerts": "Certificados Recentes",
+    "noRecentCerts": "Nenhum certificado emitido ainda",
+    "expiringCerts": "Certificados Expirando",
+    "noExpiringCerts": "Nenhum certificado vence nos próximos 30 dias",
+    "expiresInDays_one": "Vence em {{count}} dia",
+    "expiresInDays_other": "Vence em {{count}} dias",
+    "expiredDaysAgo_one": "Venceu há {{count}} dia",
+    "expiredDaysAgo_other": "Venceu há {{count}} dias",
+    "viewAll": "Ver todos"
   },
   "ca": {
     "title": "Autoridade Certificadora",
@@ -37,6 +43,17 @@
     "changePassword": "Trocar Senha",
     "noCA": "Nenhuma CA configurada",
     "noCADescription": "Crie ou importe uma CA para começar a emitir certificados",
+    "actions": "Ações da CA",
+    "caId": "ID da CA",
+    "publicCert": "Certificado Público (PEM)",
+    "copyPem": "Copiar PEM",
+    "copied": "Copiado",
+    "validUntil": "Válido até {{date}}",
+    "exportHint": "Salve o arquivo .crt e instale-o nos computadores clientes para que confiem nos certificados emitidos por esta CA.",
+    "exportSuccess": "Certificado da CA salvo em: {{path}}",
+    "copySuccess": "Certificado público da CA copiado para a área de transferência.",
+    "copyError": "Falha ao copiar o certificado.",
+    "featureUnavailable": "Ainda não disponível nesta versão.",
     "form": {
       "commonName": "Nome Comum (CN)",
       "organization": "Organização (O)",
@@ -62,6 +79,28 @@
     "delete": "Excluir",
     "validate": "Validar",
     "noCerts": "Nenhum certificado emitido",
+    "noCertsDescription": "Crie seu primeiro certificado digital assinado pela sua CA local.",
+    "count_one": "{{count}} certificado",
+    "count_other": "{{count}} certificados",
+    "favorite": "Marcar como favorito",
+    "unfavorite": "Desmarcar favorito",
+    "expiringInDays": "Expirando em {{count}}d",
+    "activeForDays": "Ativo ({{count}}d)",
+    "validUntil": "Válido até {{date}}",
+    "confirmRevoke": {
+      "title": "Revogar este certificado?",
+      "description": "O certificado \"{{name}}\" deixará de ser considerado válido. Esta ação não pode ser desfeita — para voltar a atender esse host você precisará emitir um novo certificado.",
+      "action": "Revogar"
+    },
+    "confirmDelete": {
+      "title": "Excluir este certificado?",
+      "description": "O certificado \"{{name}}\" e sua chave privada serão removidos permanentemente deste computador. Esta ação não pode ser desfeita.",
+      "action": "Excluir"
+    },
+    "revokeSuccess": "Certificado revogado com sucesso.",
+    "revokeError": "Falha ao revogar o certificado.",
+    "deleteSuccess": "Certificado excluído.",
+    "exportSuccess": "Certificado salvo em: {{path}}",
     "types": {
       "server": "Servidor",
       "client": "Cliente",
@@ -106,7 +145,16 @@
     "add": "Adicionar Servidor",
     "testConnection": "Testar Conexão",
     "deploy": "Instalar Certificado",
+    "deployShort": "Implantar",
     "noServers": "Nenhum servidor configurado",
+    "noServersDescription": "Cadastre um servidor da biblioteca (Proxmox, MikroTik, NGINX, Apache, Traefik, Docker, TrueNAS) ou um servidor personalizado via SSH para implantação automática de certificados.",
+    "delete": "Excluir servidor",
+    "confirmDelete": {
+      "title": "Excluir este servidor?",
+      "description": "O servidor \"{{name}}\" e suas credenciais salvas serão removidos. Os certificados já implantados nele não são afetados.",
+      "action": "Excluir"
+    },
+    "deleteSuccess": "Servidor excluído.",
     "form": {
       "name": "Nome do Servidor",
       "type": "Tipo de Servidor",
@@ -163,9 +211,19 @@
     "search": "Pesquisar...",
     "filter": "Filtrar",
     "noResults": "Nenhum resultado encontrado",
+    "noResultsFor": "Nada encontrado para \"{{query}}\"",
+    "noResultsHint": "Verifique a grafia ou limpe a busca para ver todos os itens.",
+    "clearSearch": "Limpar busca",
+    "export": "Exportar",
+    "copy": "Copiar",
     "days": "dias",
     "version": "Versão",
     "unknown": "Desconhecido"
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "A página que você procura não existe.",
+    "backHome": "Ir para o Dashboard"
   },
   "errors": {
     "generic": "Ocorreu um erro inesperado",

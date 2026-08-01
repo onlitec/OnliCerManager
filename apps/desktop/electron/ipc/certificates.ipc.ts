@@ -14,6 +14,7 @@ import {
 import { CertificateService } from "@onlicert/core";
 import type { CreateCertificateInput, ICertificateInfrastructure } from "@onlicert/core";
 import { logger } from "../logger";
+import { sanitizeFileName, saveTextToFile } from "../utils/saveFile";
 
 export function setupCertificateIpcHandlers(): void {
   const dataDir = app.getPath("userData");
@@ -85,6 +86,34 @@ export function setupCertificateIpcHandlers(): void {
       return { success: true, isFavorite: isFav };
     } catch (error) {
       logger.error("Failed to toggle favorite", { id, error });
+      return { success: false, error: (error as Error).message };
+    }
+  });
+
+  // Save a certificate's public PEM to a file the user picks.
+  // Only the public certificate is written — the private key stays encrypted at
+  // rest and is never exported without an explicit, password-gated flow.
+  ipcMain.handle("cert:export-file", async (event, id: string) => {
+    try {
+      const cert = certRepo.getById(id);
+      if (!cert) throw new Error("Certificate not found");
+
+      const result = await saveTextToFile(event, {
+        title: "Exportar certificado",
+        defaultFileName: `${sanitizeFileName(cert.commonName)}.crt`,
+        contents: cert.certPem,
+        filters: [
+          { name: "Certificado (PEM)", extensions: ["crt", "pem"] },
+          { name: "Todos os arquivos", extensions: ["*"] },
+        ],
+      });
+
+      if (result.success) {
+        logger.info("Certificate exported to file", { id, path: result.filePath });
+      }
+      return result;
+    } catch (error) {
+      logger.error("Failed to export certificate to file", { id, error });
       return { success: false, error: (error as Error).message };
     }
   });

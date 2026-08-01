@@ -47,9 +47,32 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      // Platform UI fonts only — no webfont downloads, so the app renders
+      // identically on an air-gapped machine.
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        mono: ["JetBrains Mono", "Fira Code", "monospace"],
+        sans: [
+          "Segoe UI Variable Display",
+          "Segoe UI",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Inter",
+          "system-ui",
+          "Ubuntu",
+          "Cantarell",
+          "Noto Sans",
+          "sans-serif",
+        ],
+        mono: [
+          "Cascadia Code",
+          "Cascadia Mono",
+          "JetBrains Mono",
+          "Fira Code",
+          "SF Mono",
+          "Consolas",
+          "Liberation Mono",
+          "Courier New",
+          "monospace",
+        ],
       },
       keyframes: {
         "accordion-down": {
@@ -68,12 +91,48 @@ export default {
           from: { transform: "translateX(-100%)" },
           to: { transform: "translateX(0)" },
         },
+        // Radix open/close transitions. Defined here rather than pulling in
+        // `tailwindcss-animate`, which this project does not depend on.
+        "overlay-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "overlay-out": {
+          from: { opacity: "1" },
+          to: { opacity: "0" },
+        },
+        "content-in": {
+          from: { opacity: "0", transform: "translate(-50%, -48%) scale(0.96)" },
+          to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+        },
+        "content-out": {
+          from: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
+          to: { opacity: "0", transform: "translate(-50%, -48%) scale(0.96)" },
+        },
+        "popover-in": {
+          from: { opacity: "0", transform: "scale(0.96)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "popover-out": {
+          from: { opacity: "1", transform: "scale(1)" },
+          to: { opacity: "0", transform: "scale(0.96)" },
+        },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.15s ease-out",
         "slide-in-from-left": "slide-in-from-left 0.2s ease-out",
+        "overlay-in": "overlay-in 0.15s ease-out",
+        "overlay-out": "overlay-out 0.15s ease-in",
+        "content-in": "content-in 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+        "content-out": "content-out 0.15s ease-in",
+        "popover-in": "popover-in 0.13s ease-out",
+        "popover-out": "popover-out 0.1s ease-in",
+        shimmer: "shimmer 1.6s infinite",
       },
     },
   },
