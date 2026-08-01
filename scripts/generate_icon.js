@@ -226,7 +226,11 @@ function encodePNG(raw) {
 
 const png = encodePNG(renderRGBA());
 const targets = [
-  path.join(__dirname, "../resources/icon.png"),
+  // electron-builder's buildResources dir. It resolves relative to the app
+  // package (apps/desktop), not the repo root — putting it at the root means
+  // electron-builder silently falls back to the stock Electron icon.
+  path.join(__dirname, "../apps/desktop/resources/icon.png"),
+  // Copied into dist/ by Vite; used as the favicon and the BrowserWindow icon.
   path.join(__dirname, "../apps/desktop/public/icon.png"),
 ];
 

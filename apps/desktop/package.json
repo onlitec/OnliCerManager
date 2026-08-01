@@ -4,6 +4,16 @@
   "private": true,
   "description": "OnliCert Manager Desktop Application",
   "main": "dist-electron/main.js",
+  "homepage": "https://github.com/onlitec/OnliCerManager",
+  "author": {
+    "name": "OnliCert Manager Contributors",
+    "email": "galvatec@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onlitec/OnliCerManager.git"
+  },
   "scripts": {
     "dev": "vite",
     "generate-pdf": "node scripts/generate_pdf_manual.js",
