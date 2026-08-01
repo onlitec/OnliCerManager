@@ -51,6 +51,13 @@ Two formats are published for every release:
 3. Run `OnliCert Manager.exe` inside the extracted folder directly — nothing is installed, no admin rights required.
 4. Your CA, certificates and logs are **not** stored inside this folder; they live in `%APPDATA%\OnliCert Manager\` (see [Where your data lives](#where-your-data-lives)), so they persist even if you move or delete the portable folder.
 
+**Windows Server (2016/2019/2022):**
+
+The installer and portable build both run on Windows Server the same way as on Windows 10/11 — follow the steps above. Two server-specific points to keep in mind:
+
+- OnliCert Manager is a GUI (Electron) application. It requires the **Desktop Experience** feature (`Server-Gui-Shell`) to be installed — it will **not** run on **Server Core**. Add it with `Install-WindowsFeature Server-Gui-Shell` (or via *Server Manager → Add Roles and Features*) if it isn't already present.
+- If you're deploying the CA root certificate to many domain machines, don't run `certutil -addstore` on each one by hand — distribute `ca.crt` via **Group Policy** instead: *Group Policy Management → (GPO) → Computer Configuration → Policies → Windows Settings → Security Settings → Public Key Policies → Trusted Root Certification Authorities → Import*. This pushes trust to every machine in the OU/domain automatically.
+
 ### Linux
 
 There is no pre-built Linux package yet — build the `.AppImage` and `.deb` from source. This only needs to be done once per machine (or version).

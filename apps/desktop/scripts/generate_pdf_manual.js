@@ -534,6 +534,24 @@ function createManualPDF(outputPath) {
     addParagraph("Método 2: Instalação Automática por Linha de Comando (CMD / PowerShell como Admin)");
     addCodeBlock("certutil -addstore -f \"ROOT\" C:\\caminho\\para\\ca.crt");
 
+    addSubHeader("3.1.1. Instalação e Uso no Windows Server (2016 / 2019 / 2022)");
+    addParagraph(
+      "O instalador e a versão portátil do OnliCert Manager funcionam no Windows Server exatamente como no Windows 10/11 — siga os mesmos passos do Método 1 ou 2 acima. Dois pontos específicos de ambiente servidor merecem atenção:"
+    );
+    addCallout(
+      "REQUISITO: DESKTOP EXPERIENCE (GUI)",
+      "O OnliCert Manager é um aplicativo gráfico (Electron) e NÃO funciona em instalações Server Core, que não possuem interface gráfica. Antes de instalar, garanta que o recurso 'Desktop Experience' esteja presente: Install-WindowsFeature Server-Gui-Shell (PowerShell como Admin) ou via Gerenciador do Servidor -> Adicionar Funções e Recursos.",
+      true
+    );
+    addParagraph(
+      "Distribuição da CA Raiz via GPO: em ambientes de domínio, em vez de rodar 'certutil -addstore' manualmente em cada máquina, distribua o arquivo ca.crt por Diretiva de Grupo, o que aplica a confiança automaticamente a todos os computadores da OU/domínio:"
+    );
+    addBullet("1. Abra o", "Console de Gerenciamento de Diretiva de Grupo (gpmc.msc).");
+    addBullet("2. Edite (ou crie) a GPO", "aplicada à OU desejada.");
+    addBullet("3. Navegue até", "Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Public Key Policies -> Trusted Root Certification Authorities.");
+    addBullet("4. Clique em", "Import... e selecione o arquivo ca.crt exportado pelo OnliCert Manager.");
+    addBullet("5. Aguarde", "a atualização de política (gpupdate /force) nas máquinas cliente para a CA ficar confiável em toda a rede.");
+
     addSubHeader("3.2. Instalação no Linux (Ubuntu, Debian, Mint)");
     addCodeBlock("sudo cp ca.crt /usr/local/share/ca-certificates/onlicert-root-ca.crt\nsudo update-ca-certificates");
 
