@@ -249,16 +249,21 @@ function createManualPDF(outputPath) {
 
       // 2 Panels
       doc.roundedRect(145, topY + 78, 190, 45, 4).fillAndStroke("#ffffff", C.border);
-      doc.fillColor(C.primary).font("Helvetica-Bold").fontSize(7.5).text("Eventos Recentes", 152, topY + 83);
-      doc.fillColor(C.textMuted).font("Helvetica").fontSize(7).text("Nenhum evento registrado", 195, topY + 98);
+      doc.fillColor(C.primary).font("Helvetica-Bold").fontSize(7.5).text("Certificados Recentes", 152, topY + 83);
+      doc.fillColor(C.textMuted).font("Helvetica").fontSize(6.5).text("Servidor Web App", 152, topY + 96);
+      doc.fillColor(C.textMuted).font("Courier").fontSize(6).text("samba.onlitec.corp", 152, topY + 105);
+      doc.fillColor(C.accent).font("Helvetica").fontSize(6).text("Ver todos", 300, topY + 83);
 
       doc.roundedRect(342, topY + 78, 190, 45, 4).fillAndStroke("#ffffff", C.border);
       doc.fillColor(C.primary).font("Helvetica-Bold").fontSize(7.5).text("Certificados Expirando", 349, topY + 83);
-      doc.fillColor(C.textMuted).font("Helvetica").fontSize(7).text("Nenhum resultado encontrado", 390, topY + 98);
+      doc.fillColor(C.success).font("Helvetica").fontSize(6.5).text("Nenhum certificado vence nos próximos 30 dias", 349, topY + 100);
     }, 135);
 
     addParagraph(
-      "A tela Dashboard reúne os indicadores-chave da sua infraestrutura local. Nela você acompanha instantaneamente se a CA Raiz está ativa (verde), quantos certificados foram gerados e se há algum certificado prestes a vencer."
+      "A tela Dashboard reúne os indicadores-chave da sua infraestrutura local. Nela você acompanha instantaneamente se a CA Raiz está ativa (verde), quantos certificados foram emitidos, quantos servidores estão cadastrados e se há algum certificado prestes a vencer."
+    );
+    addParagraph(
+      "O painel 'Certificados Recentes' lista os últimos certificados emitidos, e o painel 'Certificados Expirando' destaca, em ordem de urgência, os que vencem nos próximos 30 dias — clique em qualquer item para abrir a tela de Certificados. A barra superior do aplicativo também exibe permanentemente o nome da CA ativa: verde quando há uma CA configurada, âmbar quando ainda não há."
     );
 
     // MOCKUP 2: CA PAGE (Matching screenshot 2)
@@ -301,7 +306,7 @@ function createManualPDF(outputPath) {
     }, 130);
 
     addParagraph(
-      "A tela Autoridade Certificadora exibe os detalhes da CA Raiz ativa. Você pode visualizar o certificado PEM assinado, copiar a chave pública diretamente para a área de transferência pelo botão 'Copiar PEM' ou exportar o arquivo para os computadores clientes pelo botão 'Exportar CA'."
+      "A tela Autoridade Certificadora exibe os detalhes da CA Raiz ativa. Os dois botões de saída têm finalidades diferentes: 'Copiar PEM' coloca o texto do certificado na área de transferência (útil para colar em um campo de configuração), enquanto 'Exportar CA' abre a janela do Windows/Linux para salvar o arquivo .crt em disco — é este arquivo que você leva para os computadores clientes, conforme o Capítulo 3."
     );
 
     // MOCKUP 3: CERTIFICATES PAGE (Matching screenshot 3)
@@ -330,11 +335,14 @@ function createManualPDF(outputPath) {
       doc.fillColor(C.textMuted).font("Courier").fontSize(7.5).text("CN: samba.onlitec.corp  •  RSA_2048  •  Válido até 31/07/2027", 80, topY + 77);
 
       // Action icons
-      doc.fillColor(C.textMuted).font("Helvetica").fontSize(9).text("🚫  🗑️", 495, topY + 68);
+      doc.fillColor(C.textMuted).font("Helvetica").fontSize(9).text("⬇  🚫  🗑️", 480, topY + 68);
     }, 110);
 
     addParagraph(
       "Na tela Certificados, você encontra a lista de todos os certificados digitais emitidos pela sua CA. Na captura acima, vemos o certificado do servidor 'samba.onlitec.corp', emitido com chave RSA 2048 e validade até 2027."
+    );
+    addParagraph(
+      "Cada linha oferece três ações, da esquerda para a direita: Exportar (salva o certificado público em .crt), Revogar (invalida o certificado) e Excluir (remove o certificado e sua chave privada do computador). Revogar e Excluir são irreversíveis, por isso o aplicativo pede confirmação antes de executá-las. A estrela à esquerda do nome marca o certificado como favorito, e o campo de busca filtra por nome, Nome Comum ou tipo."
     );
 
     // MOCKUP 4 & 5: SERVERS AND ADD SERVER MODAL (Matching screenshots 4 & 5)
@@ -520,7 +528,14 @@ function createManualPDF(outputPath) {
       "Para que o certificado emitido para 'samba.onlitec.corp' ou qualquer outro servidor seja aceito sem nenhum aviso de erro no Google Chrome, Microsoft Edge ou Firefox, o certificado da CA Raiz ('OnliCert Local Root CA') deve ser importado no repositório confiável dos computadores."
     );
 
-    addParagraph("Passo Inicial: Na tela 'Autoridade Certificadora', clique em 'Exportar CA' ou 'Copiar PEM' e salve o arquivo ca.crt no computador do usuário.");
+    addParagraph(
+      "Passo Inicial: na tela 'Autoridade Certificadora', clique em 'Exportar CA'. O aplicativo abrirá a janela padrão de salvamento do sistema, já sugerindo um nome de arquivo baseado no Nome Comum da sua CA (por exemplo, OnliCert_Local_Root_CA.crt). Escolha a pasta, salve, e leve esse arquivo .crt para os computadores que precisam confiar na sua CA."
+    );
+    addCallout(
+      "APENAS O CERTIFICADO PÚBLICO É EXPORTADO",
+      "O arquivo .crt gerado contém somente o certificado público da CA — nunca a chave privada, que permanece criptografada com AES-256 neste computador. Por isso é seguro distribuí-lo livremente pela rede, por e-mail ou por GPO.",
+      false
+    );
 
     addSubHeader("3.1. Instalação no Microsoft Windows (Windows 10 / 11)");
     addParagraph("Método 1: Assistente Gráfico do Windows");
