@@ -110,7 +110,9 @@ export function SettingsPage() {
             </div>
             <div>
               <p className="text-sm font-semibold">OnliCert Manager</p>
-              <p className="text-xs text-muted-foreground">{t("common.version")} 0.1.0 — MIT License</p>
+              <p className="text-xs text-muted-foreground">
+                {t("common.version")} {__APP_VERSION__} — MIT License
+              </p>
             </div>
           </div>
           <Separator />

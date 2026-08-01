@@ -2,6 +2,9 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
 
+// Read from package.json so the manual can't claim a version the app isn't.
+const { version: APP_VERSION } = require("../package.json");
+
 function createManualPDF(outputPath) {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
@@ -214,7 +217,7 @@ function createManualPDF(outputPath) {
     // CHAPTER 1
     addSectionHeader("1", "Ilustração Visual das Telas do Aplicativo");
     addParagraph(
-      "Abaixo estão apresentadas as capturas de tela fieis à interface do OnliCert Manager v0.1.0, com explicação completa de cada janela e seus elementos."
+      `Abaixo estão apresentadas as capturas de tela fieis à interface do OnliCert Manager v${APP_VERSION}, com explicação completa de cada janela e seus elementos.`
     );
 
     // MOCKUP 1: DASHBOARD (Matching screenshot 1)
@@ -597,7 +600,7 @@ function createManualPDF(outputPath) {
       }
 
       doc.strokeColor(C.border).lineWidth(0.5).moveTo(40, 792 - 28).lineTo(555, 792 - 28).stroke();
-      doc.fillColor(C.textMuted).font("Helvetica").fontSize(8).text("OnliCert Manager v0.1.0 — Documentação Oficial de Telas e Campos", 40, 792 - 20);
+      doc.fillColor(C.textMuted).font("Helvetica").fontSize(8).text(`OnliCert Manager v${APP_VERSION} — Documentação Oficial de Telas e Campos`, 40, 792 - 20);
       doc.fillColor(C.textMuted).font("Helvetica").fontSize(8).text(`Página ${i + 1} de ${pageCount}`, 465, 792 - 20, { align: "right" });
     }
 

@@ -114,7 +114,7 @@ export function Sidebar() {
       {/* Footer */}
       <div className="border-t border-border px-4 py-3">
         <p className="text-xs text-muted-foreground text-center">
-          v0.1.0 — Open Source
+          v{__APP_VERSION__} — Open Source
         </p>
       </div>
     </aside>

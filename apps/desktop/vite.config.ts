@@ -2,9 +2,17 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import electron from "vite-plugin-electron/simple";
 import path from "path";
+import { createRequire } from "module";
+
+const pkg = createRequire(import.meta.url)("./package.json") as { version: string };
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Single source of truth for the version shown in the UI, so it can't drift
+  // from package.json the way three hardcoded copies previously did.
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [
     react(),
     (electron as any)({
