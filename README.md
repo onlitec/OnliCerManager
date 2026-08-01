@@ -1,80 +1,115 @@
+<div align="center">
+
 # OnliCert Manager
 
-> **Professional certificate management with local CA support.**
-> No command-line knowledge required. Powered by OpenSSL.
+**Run your own Certificate Authority, without touching the command line.**
+
+Create a local CA, issue TLS certificates, and deploy them to your servers — all from a desktop app.
+Everything stays on your machine: no cloud, no accounts, no telemetry.
 
 [![CI](https://github.com/onlitec/OnliCerManager/actions/workflows/ci.yml/badge.svg)](https://github.com/onlitec/OnliCerManager/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)](#download--installation)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-339933.svg?logo=node.js&logoColor=white)](https://nodejs.org/)
+
+[Download](#download--installation) · [Getting started](#getting-started-first-run) · [Deployment targets](#deployment-targets) · [Build from source](#build-from-source) · [Contributing](CONTRIBUTING.md)
+
+</div>
 
 ---
 
-## What is OnliCert Manager?
+## Why?
 
-OnliCert Manager is an open-source Desktop application for Windows and Linux that lets system administrators:
+Internal services — a Proxmox host, a NAS, a router's web UI, a staging environment — need TLS just like public ones do. But Let's Encrypt can't reach them, and doing it by hand means memorising `openssl req -x509 -newkey rsa:4096 -keyout …` and keeping track of which key belongs to which host and when it expires.
 
-- **Create a local CA** (Certificate Authority) with RSA or ECC
-- **Issue certificates** for servers, clients, VPN, code signing, e-mail
-- **Deploy automatically** to Proxmox, MikroTik, TrueNAS, Nginx, Apache, Traefik, Docker, Windows and Linux
-- **Manage renewals** with expiry alerts
+OnliCert Manager gives you a real internal CA with a UI: issue a certificate in a few fields, push it to the target server, and see what's about to expire before it breaks.
 
-Everything runs locally. No cloud. No accounts required.
+All cryptography is delegated to the actual **OpenSSL binary** — nothing is reimplemented in JavaScript.
+
+## Features
+
+- **Local Certificate Authority** — create a root CA with RSA (2048/4096) or ECC (P-256/P-384/P-521), and export its public certificate as a `.crt` to install on client machines.
+- **Certificate issuance** — server, client, VPN, code-signing, e-mail and web-server profiles, with Subject Alternative Names (DNS and IP).
+- **One-click deployment** — push certificates to [10 kinds of target](#deployment-targets) over SSH/SFTP or the target's own API.
+- **Expiry tracking** — the dashboard surfaces certificates expiring within 30 days, ordered by urgency.
+- **Encrypted at rest** — private keys are stored AES-256-GCM encrypted under a password you choose; never in plaintext.
+- **Offline by design** — no network calls, no fonts or assets fetched from CDNs. Works on air-gapped machines.
+- **Bilingual UI** — Portuguese (pt-BR) and English (en-US).
+
+### Project status
+
+This is a **0.1.x** release. The core workflow — create a CA, issue certificates, deploy them, track expiry — works end to end. Some actions are visible in the UI but not implemented yet, and are shown disabled with a tooltip rather than failing silently:
+
+| Area | Status |
+|---|---|
+| Create CA, issue / revoke / delete certificates | ✅ Working |
+| Export CA and certificates to file | ✅ Working |
+| Deploy to servers, test connection | ✅ Working |
+| Expiry dashboard | ✅ Working |
+| Import an existing CA | 🚧 Planned |
+| CA backup / restore, change CA password | 🚧 Planned |
+| Automated renewal | 🚧 Planned |
+| macOS builds | 🚧 Untested — the build target exists but no release is published |
 
 ---
 
 ## Download & Installation
 
-Pre-built binaries are published on the [Releases page](https://github.com/onlitec/OnliCerManager/releases). Pick the option that fits your platform below.
+Pre-built binaries are published on the [Releases page](https://github.com/onlitec/OnliCerManager/releases).
 
-> **Note:** builds are not code-signed yet. Windows SmartScreen and some Linux tools may warn that the publisher is unverified — this is expected for an unsigned open-source build, not a sign of tampering. See [Verifying a release](#verifying-a-release) if you want to double-check what you downloaded.
+> **Note:** builds are not code-signed yet. Windows SmartScreen and some Linux tools may warn that the publisher is unverified — this is expected for an unsigned open-source build, not a sign of tampering. See [Verifying a release](#verifying-a-release) if you want to check what you downloaded.
 
-### Windows
+### Windows 10 / 11
 
 Two formats are published for every release:
 
 | File | What it is | When to use it |
 |------|------------|-----------------|
 | `OnliCert.Manager.Setup.<version>.exe` | Full installer (NSIS) | Normal desktop install, with shortcuts and an uninstaller |
-| `OnliCert-Manager-<version>-win-portable.zip` | Portable build | No install/admin rights needed; run from a USB drive, etc. |
+| `OnliCert-Manager-<version>-win-portable.zip` | Portable build | No install or admin rights needed; run from a USB drive |
 
-**Installer:**
+<details>
+<summary><b>Installer — step by step</b></summary>
 
 1. Download `OnliCert.Manager.Setup.<version>.exe` from [Releases](https://github.com/onlitec/OnliCerManager/releases).
-2. Run it. If Windows SmartScreen shows "Windows protected your PC", click **More info → Run anyway** (this is because the binary isn't code-signed, not a malware detection).
-3. The installer lets you pick the install directory and creates a Desktop and Start Menu shortcut named **OnliCert Manager**. It is not a silent/one-click installer, so you'll see each step.
+2. Run it. If Windows SmartScreen shows *"Windows protected your PC"*, click **More info → Run anyway** (this is because the binary isn't code-signed, not a malware detection).
+3. The installer lets you pick the install directory and creates Desktop and Start Menu shortcuts named **OnliCert Manager**. It is not a silent/one-click installer, so you'll see each step.
 4. Launch it from the Start Menu or the Desktop shortcut.
-5. To remove it later, use **Settings → Apps → OnliCert Manager → Uninstall**, or run the uninstaller placed in the install directory.
+5. To remove it later: **Settings → Apps → OnliCert Manager → Uninstall**, or run the uninstaller in the install directory.
 
-**Portable (no installation):**
+</details>
+
+<details>
+<summary><b>Portable — no installation</b></summary>
 
 1. Download `OnliCert-Manager-<version>-win-portable.zip` from [Releases](https://github.com/onlitec/OnliCerManager/releases).
-2. Extract the ZIP anywhere (a regular folder, an external drive, etc.).
-3. Run `OnliCert Manager.exe` inside the extracted folder directly — nothing is installed, no admin rights required.
-4. Your CA, certificates and logs are **not** stored inside this folder; they live in `%APPDATA%\OnliCert Manager\` (see [Where your data lives](#where-your-data-lives)), so they persist even if you move or delete the portable folder.
+2. Extract the ZIP anywhere — a regular folder, an external drive, whatever.
+3. Run `OnliCert Manager.exe` inside the extracted folder. Nothing is installed and no admin rights are needed.
+4. Your CA, certificates and logs are **not** kept inside that folder — they live in `%APPDATA%\OnliCert Manager\` (see [Where your data lives](#where-your-data-lives)), so they survive moving or deleting the portable folder.
 
-**Windows Server (2016/2019/2022):**
+</details>
 
-The installer and portable build both run on Windows Server the same way as on Windows 10/11 — follow the steps above. Two server-specific points to keep in mind:
+### Windows Server (2016 / 2019 / 2022)
 
-- OnliCert Manager is a GUI (Electron) application. It requires the **Desktop Experience** feature (`Server-Gui-Shell`) to be installed — it will **not** run on **Server Core**. Add it with `Install-WindowsFeature Server-Gui-Shell` (or via *Server Manager → Add Roles and Features*) if it isn't already present.
-- If you're deploying the CA root certificate to many domain machines, don't run `certutil -addstore` on each one by hand — distribute `ca.crt` via **Group Policy** instead: *Group Policy Management → (GPO) → Computer Configuration → Policies → Windows Settings → Security Settings → Public Key Policies → Trusted Root Certification Authorities → Import*. This pushes trust to every machine in the OU/domain automatically.
+The installer and portable build both run on Windows Server exactly as on Windows 10/11 — follow the steps above. Two server-specific points:
+
+- **Desktop Experience is required.** OnliCert Manager is a GUI (Electron) application and will **not** run on **Server Core**. If the GUI shell isn't present, add it with `Install-WindowsFeature Server-Gui-Shell` (or *Server Manager → Add Roles and Features*).
+- **Use Group Policy to distribute the CA**, not `certutil` on every box. Once you've exported `ca.crt`, push it domain-wide via *Group Policy Management → (your GPO) → Computer Configuration → Policies → Windows Settings → Security Settings → Public Key Policies → Trusted Root Certification Authorities → Import*.
 
 ### Linux
 
-There is no pre-built Linux package yet — build the `.AppImage` and `.deb` from source. This only needs to be done once per machine (or version).
+There's no pre-built Linux package yet — build the `.AppImage` and `.deb` from source. You only need to do this once per version.
 
-**1. Install prerequisites:**
+**1. Install prerequisites**
 
 ```bash
-# Debian/Ubuntu
+# Debian / Ubuntu
 sudo apt install openssl build-essential python3
-
-# Node.js >= 20 and pnpm >= 9 (if you don't have them already)
-# See https://nodejs.org/ and https://pnpm.io/installation
 ```
 
-`build-essential` and `python3` are required by `node-gyp` to compile the native modules used by this app (`better-sqlite3`, `ssh2`).
+`build-essential` and `python3` are needed by `node-gyp` to compile this app's native modules (`better-sqlite3`, `ssh2`). You'll also need [Node.js](https://nodejs.org/) >= 20 and [pnpm](https://pnpm.io/installation) >= 9.
 
-**2. Clone, install dependencies, and build:**
+**2. Clone and build**
 
 ```bash
 git clone https://github.com/onlitec/OnliCerManager.git
@@ -83,130 +118,178 @@ pnpm install
 pnpm --filter desktop build
 ```
 
-This compiles the app and packages it with `electron-builder` for your host platform. When run on Linux, it produces an `.AppImage` and a `.deb` package inside `apps/desktop/dist-release/`.
+This packages the app with `electron-builder` for your host platform, producing an `.AppImage` and a `.deb` in `apps/desktop/dist-release/`.
 
-**3. Install/run the package:**
+**3. Install or run**
 
 ```bash
-# AppImage — just make it executable and run it
+# AppImage — make it executable and run it
 chmod +x apps/desktop/dist-release/*.AppImage
-apps/desktop/dist-release/*.AppImage
+./apps/desktop/dist-release/*.AppImage
 
-# .deb — install it system-wide with apt or dpkg
+# .deb — install system-wide
 sudo apt install ./apps/desktop/dist-release/*.deb
-# or: sudo dpkg -i apps/desktop/dist-release/*.deb
 ```
 
-> On recent distros (Ubuntu 22.04+, Fedora, etc.), AppImages require `libfuse2` to run: `sudo apt install libfuse2` (or `libfuse2t64` on newer Ubuntu releases). If you'd rather not install FUSE, extract and run it instead: `./OnliCert*.AppImage --appimage-extract-and-run`.
+> On recent distros (Ubuntu 22.04+, Fedora, …) AppImages need `libfuse2`: `sudo apt install libfuse2` (or `libfuse2t64` on newer Ubuntu). To skip FUSE entirely, run it as `./OnliCert*.AppImage --appimage-extract-and-run`.
 
-Once installed, launch **OnliCert Manager** from your application menu, or run the AppImage/`onlicert-manager` binary directly.
+Afterwards, launch **OnliCert Manager** from your application menu or run the binary directly.
 
 ### Verifying a release
 
-Every release on GitHub lists the exact commit it was built from. If you want to confirm a downloaded binary matches the published source, compare `apps/desktop/dist-release/latest.yml`'s checksum (Windows) against the one on the [release page](https://github.com/onlitec/OnliCerManager/releases), or rebuild it yourself following the Linux steps above (the build is reproducible from source on any platform).
+Every release lists the commit it was built from. To confirm a download matches the published source, compare the checksum on the [release page](https://github.com/onlitec/OnliCerManager/releases), or rebuild it yourself with the steps above — the build runs from source on any platform.
 
 ---
 
 ## Getting Started (First Run)
 
-Once the app is open, the typical workflow is:
+1. **Create your Root CA** — go to **Certificate Authority** in the sidebar and fill in the CA name, Common Name, key algorithm and validity period. You'll set a **master password** here: it encrypts the CA's private key at rest and is required every time you issue a certificate. **If you lose it, the CA cannot be recovered.**
+2. **Export the CA certificate** — click **Export CA** to save `ca.crt`, then install it on the machines that should trust your certificates. Only the *public* certificate is written to that file; the private key never leaves the app unencrypted, so it's safe to distribute freely.
+3. **Issue a certificate** — **Certificates → Issue Certificate**. Fill in the Common Name (the FQDN the service is reached at), the certificate type, any Subject Alternative Names, and your CA password.
+4. **Register a target server** — **Servers → Add Server**, pick a [deployment plugin](#deployment-targets), enter its connection details, and use **Test Connection** before saving.
+5. **Deploy** — use **Deploy** on the server to push the certificate and its key to the target.
+6. **Watch for renewals** — the dashboard highlights anything expiring within 30 days.
 
-1. **Create your Root CA** — go to **Autoridade Certificadora (CA)** in the sidebar and fill in the CA name, Common Name, key algorithm (RSA or ECC) and validity period. You'll set a **master password** here — it encrypts the CA's private key at rest (AES-256-GCM) and is required every time you issue a certificate, so don't lose it.
-2. **Issue a certificate** — go to **Certificados → Emitir Certificado**, fill in the Common Name, certificate type (server, client, VPN, code signing, e-mail…), any Subject Alternative Names, and the CA password from step 1.
-3. **Register a target server** — go to **Servidores → Adicionar Servidor** and pick a deployment plugin: Proxmox VE, MikroTik RouterOS, TrueNAS, Nginx, Apache, Traefik, Docker, Samba, or a generic SSH server. Fill in its connection details and use **Testar Conexão** before saving.
-4. **Deploy the certificate** — from the Servers or Certificates page, use **Implantar** to push the certificate (and private key) to the registered server over its plugin (SSH/SFTP or the target's REST API).
-5. **Keep an eye on renewals** — the Dashboard highlights certificates that are expiring soon.
+<details>
+<summary><b>Installing the CA certificate on client machines</b></summary>
+
+Until clients trust your CA, browsers will still warn about certificates it issued.
+
+```powershell
+# Windows (admin PowerShell / CMD)
+certutil -addstore -f "ROOT" C:\path\to\ca.crt
+```
+
+```bash
+# Debian / Ubuntu
+sudo cp ca.crt /usr/local/share/ca-certificates/onlicert-root-ca.crt
+sudo update-ca-certificates
+```
+
+**Firefox** keeps its own certificate store: *Settings → Privacy & Security → Certificates → View Certificates… → Authorities → Import…*, then tick *Trust this CA to identify websites*.
+
+**macOS:** open `ca.crt` in Keychain Access, move it to the **System** keychain, then set it to *Always Trust*.
+
+For domain-wide deployment on Windows, see the [Group Policy note above](#windows-server-2016--2019--2022).
+
+</details>
 
 ### Where your data lives
 
-Everything is local — there's no cloud account and no telemetry. The SQLite database (CA, certificates, server configs) and log files live in Electron's standard per-OS `userData` folder for this app:
+Everything is local — no cloud account, no telemetry. The SQLite database and logs live in Electron's standard per-OS `userData` folder:
 
-- **Windows:** `%APPDATA%\OnliCert Manager\` (i.e. `C:\Users\<you>\AppData\Roaming\OnliCert Manager\`)
-- **Linux:** `~/.config/OnliCert Manager/`
+| Platform | Location |
+|---|---|
+| Windows | `%APPDATA%\OnliCert Manager\` |
+| Linux | `~/.config/OnliCert Manager/` |
 
-Inside that folder: `onlicert.db` (SQLite database) and `logs/` (Winston logs — check these first if something isn't working).
+Inside you'll find `onlicert.db` (the database) and `logs/` — check the logs first if something misbehaves.
 
----
-
-## Build from Source (Development)
-
-If you want to run the app from source instead of a packaged build — e.g. to contribute or debug:
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) >= 20
-- [pnpm](https://pnpm.io/) >= 9
-- OpenSSL installed (Linux: `sudo apt install openssl`; bundled automatically on Windows)
-
-### Install & Run
-
-```bash
-# Clone the repository
-git clone https://github.com/onlitec/OnliCerManager.git
-cd OnliCerManager
-
-# Install dependencies
-pnpm install
-
-# Start in development mode
-pnpm dev
-```
-
-To produce a packaged build yourself (installer/portable on Windows, AppImage/.deb on Linux) instead of running in dev mode, use `pnpm --filter desktop build` — see the [Download & Installation](#download--installation) section above for what that produces on each platform.
+> **Back this folder up.** It holds your CA's encrypted private key. Losing it means losing the CA.
 
 ---
 
-## Project Structure
+## Deployment Targets
 
-```
-onlicert-manager/
-├── apps/
-│   └── desktop/          # Electron + React 19 + Vite application
-├── packages/
-│   ├── core/             # Domain entities and business logic
-│   ├── infrastructure/   # OpenSSL wrapper, SQLite, SSH, encryption
-│   └── plugins/
-│       ├── plugin-interface/  # Plugin contract (IPlugin)
-│       ├── proxmox/           # Proxmox VE plugin
-│       ├── mikrotik/          # MikroTik plugin
-│       └── ...                # Other deployment plugins
-├── resources/
-│   └── openssl/win32/    # Bundled OpenSSL binary for Windows
-└── docs/                 # Documentation
-```
+Certificates can be pushed directly to any of these. API-based targets talk to the product's own REST API; the rest use SSH/SFTP.
 
----
+| Target | Transport | Notes |
+|---|---|---|
+| **Proxmox VE** | REST API | Updates `pveproxy` without restarting VMs; uses an API token |
+| **MikroTik RouterOS** | API | Uploads and binds the certificate |
+| **NGINX** | SSH/SFTP | Writes the cert/key and reloads the service |
+| **Apache** | SSH/SFTP | Writes the cert/key and reloads the service |
+| **Traefik** | SSH/SFTP | Drops files into the configured directory |
+| **Docker** | SSH/SFTP | For containerised reverse proxies |
+| **TrueNAS** | SSH/SFTP | |
+| **Samba** | SSH/SFTP | |
+| **Generic Linux** | SSH/SFTP | Configurable destination paths |
+| **Custom SSH** | SSH/SFTP | Full control over paths and the post-deploy command |
 
-## Technology Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 19, TypeScript, Vite |
-| Styling | TailwindCSS, Shadcn/UI |
-| Desktop | Electron |
-| Backend | Node.js (main process) |
-| Database | SQLite (better-sqlite3) |
-| Cryptography | OpenSSL (bundled on Windows) |
-| SSH | ssh2, ssh2-sftp-client |
-| Logging | Winston |
+Adding a new target means implementing the `IPlugin` contract — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## Security
 
-- Private keys are **never stored in plaintext** — encrypted with AES-256-GCM + scrypt
-- OpenSSL is invoked via `spawn` (no shell) — **no command injection** possible
-- Electron with `contextIsolation: true` and `nodeIntegration: false`
-- All IPC channels are typed and validated
+- **Private keys are never stored in plaintext.** They're encrypted with AES-256-GCM using a scrypt-derived key from your password.
+- **No shell interpolation.** OpenSSL and every other external process is invoked via `spawn`/`execFile` with an explicit argument array, so a hostname or Common Name can never be interpreted as a shell command.
+- **Passwords are never passed as CLI arguments** — they go to OpenSSL through environment variables, so they don't appear in the process list.
+- **Hardened Electron** — `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, and a strict Content-Security-Policy. The renderer has no direct Node or filesystem access.
+- **Explicit IPC surface** — the renderer can only call a hardcoded allowlist of typed IPC channels.
+- **No outbound connections**, except the SSH/API calls you explicitly configure for deployment.
+
+Found a security issue? Please open an issue — or, for anything sensitive, contact the maintainers privately first.
 
 ---
+
+## Build from Source
+
+Requires [Node.js](https://nodejs.org/) >= 20, [pnpm](https://pnpm.io/) >= 9, and OpenSSL on `PATH` (bundled automatically on Windows).
+
+```bash
+git clone https://github.com/onlitec/OnliCerManager.git
+cd OnliCerManager
+pnpm install
+pnpm dev          # run in development mode
+```
+
+Common tasks — all run from the repo root:
+
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Run the app in development (Vite + Electron) |
+| `pnpm build` | Build the app and package an installer |
+| `pnpm lint` | ESLint across all packages |
+| `pnpm typecheck` | `tsc --noEmit` across all packages |
+| `pnpm test` | Vitest across all packages |
+| `pnpm format` | Prettier |
+
+Scope any of them to one package with `pnpm --filter <name> <script>`, e.g. `pnpm --filter @onlicert/infrastructure test`.
+
+> Infrastructure tests spawn the real OpenSSL binary, so OpenSSL must be installed and on `PATH`.
+
+### Project structure
+
+A pnpm workspace following Clean Architecture — the domain layer has no knowledge of Electron, SQLite or OpenSSL:
+
+```
+apps/
+  desktop/                 Electron + React 19 + Vite (the only app)
+    electron/              main process: IPC handlers, preload bridge
+    src/                   renderer: pages, components, hooks, i18n
+packages/
+  core/                    domain entities and application services
+  infrastructure/          OpenSSL wrapper, SQLite repositories, encryption
+  plugins/
+    plugin-interface/      the IPlugin contract
+    proxmox/  mikrotik/    API-based deployment plugins
+resources/openssl/win32/   OpenSSL binary bundled for Windows
+docs/                      user manual (PDF)
+```
+
+### Technology stack
+
+| Layer | Technology |
+|-------|-----------|
+| UI | React 19, TypeScript, Vite, TailwindCSS, Radix UI |
+| Desktop shell | Electron 33 |
+| Database | SQLite (`better-sqlite3`, WAL mode) |
+| Cryptography | OpenSSL CLI (bundled on Windows) |
+| Remote access | `ssh2`, `ssh2-sftp-client` |
+| Logging | Winston |
+| Tests | Vitest |
+
+---
+
+## Documentation
+
+A full illustrated user manual (in Portuguese) ships with the app — press <kbd>F1</kbd>, or read [`docs/manual_onlicert_manager.pdf`](docs/manual_onlicert_manager.pdf). It covers every screen field by field, choosing between RSA and ECC, installing the root CA on Windows/Linux/macOS/Firefox, and setting up Proxmox and MikroTik deployment.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for setup, conventions and the checks to run before opening a PR.
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+[MIT](LICENSE) © OnliCert Manager Contributors
