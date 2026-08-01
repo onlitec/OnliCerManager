@@ -90,6 +90,13 @@ jobs:
         # for why install-app-deps can't be used here.
         run: pnpm rebuild:native
 
+      - name: Fetch bundled OpenSSL
+        if: runner.os == 'Windows'
+        # Windows has no system OpenSSL, so it ships inside the app. The script
+        # pins the archive by SHA-256 and fails the build on a mismatch rather
+        # than bundling an unverified crypto binary.
+        run: pnpm fetch:openssl
+
       - name: Generate PDF manual
         run: node apps/desktop/scripts/generate_pdf_manual.js
 

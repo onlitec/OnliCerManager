@@ -6,4 +6,9 @@ build
 out
 .vite
 coverage
+
+# Third-party OpenSSL binaries bundled into the Windows build. Fetched and
+# SHA-256 verified by scripts/fetch_openssl_windows.js — not committed, so the
+# repository stays free of vendored binaries.
+apps/desktop/resources/openssl
 resources/openssl

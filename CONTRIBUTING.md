@@ -11,7 +11,9 @@ pnpm install
 pnpm dev
 ```
 
-Requirements: Node.js >= 20, pnpm >= 9, and OpenSSL on `PATH` (Linux/macOS — Windows uses the bundled binary). See the [Build from Source](README.md#build-from-source) section of the README for details.
+Requirements: Node.js >= 20, pnpm >= 9, and OpenSSL on `PATH` — including on Windows. The packaged Windows app bundles its own OpenSSL, but the test suite and `pnpm dev` invoke whatever is on `PATH`, so you still need one locally.
+
+> The bundled Windows binary is fetched at build time by `scripts/fetch_openssl_windows.js`, pinned by version and SHA-256, and is **not** committed. Run it standalone with `pnpm fetch:openssl`. Updating OpenSSL means bumping `VERSION` and `SHA256` together in that script and re-verifying the hash against the publisher's page — users only get security fixes when we ship a release.
 
 ### Native modules
 

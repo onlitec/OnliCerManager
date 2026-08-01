@@ -35,10 +35,17 @@ export class OpenSSLWrapper {
     const binary = OpenSSLBinary.resolve();
     const { stdin, timeoutMs = this.DEFAULT_TIMEOUT_MS, env } = options;
 
+    // The bundled Windows build has an OPENSSLDIR compiled in that points at the
+    // packager's machine, so it must be told where its config actually lives.
+    // Only set when we're using the bundled binary — a system OpenSSL already
+    // knows its own OPENSSLDIR, and overriding it could break a user's setup.
+    const bundledConfig = OpenSSLBinary.getBundledConfigPath();
+    const configEnv = bundledConfig !== null ? { OPENSSL_CONF: bundledConfig } : {};
+
     return new Promise((resolve, reject) => {
       const child = spawn(binary, args, {
         stdio: ["pipe", "pipe", "pipe"],
-        env: { ...process.env, ...env },
+        env: { ...process.env, ...configEnv, ...env },
         // Never use shell — prevents injection
         shell: false,
       });

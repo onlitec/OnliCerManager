@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "vite",
     "generate-pdf": "node scripts/generate_pdf_manual.js",
-    "build": "node scripts/generate_pdf_manual.js && tsc -p tsconfig.node.json && vite build && electron-builder",
+    "build": "node ../../scripts/fetch_openssl_windows.js && node scripts/generate_pdf_manual.js && tsc -p tsconfig.node.json && vite build && electron-builder",
     "build:renderer": "vite build",
     "build:electron": "tsc -p tsconfig.node.json",
     "preview": "vite preview",

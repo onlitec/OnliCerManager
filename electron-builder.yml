@@ -31,6 +31,12 @@ win:
   publisherName: OnliCert Manager
   # Applies to the zip target; nsis overrides it below.
   artifactName: OnliCert-Manager-${version}-win-portable.${ext}
+  # Windows has no system OpenSSL, so it ships with the app. Lands at
+  # <install>/resources/openssl/win32/, which is where OpenSSLBinary looks.
+  # Populated by scripts/fetch_openssl_windows.js — run it before packaging.
+  extraResources:
+    - from: resources/openssl
+      to: openssl
 
 nsis:
   oneClick: false

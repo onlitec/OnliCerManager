@@ -59,17 +59,25 @@ Pre-built binaries are published on the [Releases page](https://github.com/onlit
 
 > **Note:** builds are not code-signed yet. Windows SmartScreen and some Linux tools may warn that the publisher is unverified — this is expected for an unsigned open-source build, not a sign of tampering. See [Verifying a release](#verifying-a-release) if you want to check what you downloaded.
 
-### Prerequisite: OpenSSL
+### About OpenSSL
 
-**OpenSSL must be installed and on your `PATH`.** All cryptography is delegated to the real OpenSSL binary rather than reimplemented, so without it the app opens but fails as soon as you try to create a CA.
+All cryptography is delegated to the real OpenSSL binary rather than reimplemented, so the app needs one available.
 
-| Platform | How to get it |
-|---|---|
-| Debian / Ubuntu | `sudo apt install openssl` — the `.deb` pulls it in automatically |
-| Fedora / RHEL | `sudo dnf install openssl` |
-| Windows | Not included with Windows. Install it with `winget install ShiningLight.OpenSSL.Light`, or via [Git for Windows](https://git-scm.com/download/win), which bundles one — then confirm with `openssl version` in a new terminal |
+- **Windows:** nothing to do — OpenSSL ships inside the app. Windows has no system OpenSSL, so the installer and portable build both carry their own copy (currently 3.5.7 LTS), used in preference to anything on your `PATH`.
+- **Linux:** uses the system OpenSSL. The `.deb` declares it as a dependency, so `apt` installs it for you; for the AppImage, `sudo apt install openssl` (or `sudo dnf install openssl`) if it somehow isn't already present.
 
-On Windows the app also checks `C:\Program Files\OpenSSL-Win64\bin\openssl.exe`, the default location of the Shining Light installer, so that works even if it isn't on `PATH`.
+If OpenSSL can't be found, the app says so on your first action and tells you how to install it for your platform.
+
+<details>
+<summary><b>Where the bundled Windows binary comes from</b></summary>
+
+It's [FireDaemon's OpenSSL distribution for Windows](https://kb.firedaemon.com/support/solutions/articles/4000121705), which publishes checksums and permits redistribution under the OpenSSL licence (Apache 2.0). The bundled files carry OpenSSL's `LICENSE.txt` in `resources/openssl/win32/`.
+
+The binary is **not** committed to this repository. `scripts/fetch_openssl_windows.js` downloads it during the build, pinned by version *and* SHA-256; if upstream ever serves different bytes, the hash check fails and the build stops rather than shipping an unverified crypto binary.
+
+**The trade-off:** bundling means you get OpenSSL security fixes when we ship a release, not when your OS updates. On Linux, where a system OpenSSL is available and patched by your distribution, we deliberately don't bundle.
+
+</details>
 
 ### Windows 10 / 11
 
@@ -230,7 +238,7 @@ Found a security issue? Please open an issue — or, for anything sensitive, con
 
 ## Build from Source
 
-Requires [Node.js](https://nodejs.org/) >= 20, [pnpm](https://pnpm.io/) >= 9, and OpenSSL on `PATH`.
+Requires [Node.js](https://nodejs.org/) >= 20, [pnpm](https://pnpm.io/) >= 9, and OpenSSL on `PATH` (the tests invoke it directly, so it's needed even on Windows where the packaged app bundles its own).
 
 ```bash
 git clone https://github.com/onlitec/OnliCerManager.git
@@ -280,7 +288,7 @@ docs/                      user manual (PDF)
 | UI | React 19, TypeScript, Vite, TailwindCSS, Radix UI |
 | Desktop shell | Electron 33 |
 | Database | SQLite (`better-sqlite3`, WAL mode) |
-| Cryptography | OpenSSL CLI (system-installed) |
+| Cryptography | OpenSSL CLI (bundled on Windows, system on Linux) |
 | Remote access | `ssh2`, `ssh2-sftp-client` |
 | Logging | Winston |
 | Tests | Vitest |
