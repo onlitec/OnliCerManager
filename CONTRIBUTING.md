@@ -23,9 +23,11 @@ Fix it with:
 pnpm rebuild:native
 ```
 
-It rebuilds only the modules that actually have to run inside Electron (currently just `better-sqlite3`), which normally means downloading a prebuilt binary — no C++ toolchain required. It deliberately does *not* use `electron-builder install-app-deps`: that rebuilds every native module it finds, including `cpu-features`, an optional `ssh2` dependency with no prebuilt binary that needs a full MSVC toolchain and fails even on a stock Windows CI runner. `ssh2` works fine without it.
+`better-sqlite3` ships prebuilt binaries for Electron, so this normally downloads rather than compiles and needs no C++ toolchain.
 
-It's a separate step rather than a `postinstall` hook so a failed rebuild can't block `pnpm install` outright. You need it if you hit the error above, or before packaging a release.
+Related: the root `package.json` sets `pnpm.ignoredOptionalDependencies: ["cpu-features"]`. `cpu-features` is an optional `ssh2` dependency that ships no prebuilt binary and needs a full MSVC toolchain to compile — it fails even on a stock Windows CI runner, and because the rebuild treats that as fatal it takes the whole build down. `ssh2` only uses it to detect CPU crypto acceleration and works without it, so it's excluded from the dependency tree entirely. **Don't remove that entry** without a plan for building it on Windows.
+
+The rebuild is a separate step rather than a `postinstall` hook so a failed rebuild can't block `pnpm install` outright. You need it if you hit the error above, or before packaging a release.
 
 The release workflow runs it on CI, then verifies the result with `scripts/verify_native_modules.js`, which loads each addon under the packaged Electron runtime and fails the build if any won't load.
 

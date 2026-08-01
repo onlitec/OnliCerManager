@@ -13,7 +13,7 @@
   },
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "rebuild:native": "node scripts/rebuild_native.js",
+    "rebuild:native": "pnpm --filter desktop exec electron-builder install-app-deps",
     "dev": "pnpm --filter desktop dev",
     "build": "pnpm --filter desktop build",
     "preview": "pnpm --filter desktop preview",
@@ -33,5 +33,10 @@
     "prettier": "^3.3.0",
     "rimraf": "^6.0.0",
     "typescript": "^5.5.0"
+  },
+  "pnpm": {
+    "ignoredOptionalDependencies": [
+      "cpu-features"
+    ]
   }
 }
