@@ -60,7 +60,15 @@ linux:
       Categories: Utility;Network;Security;
       Keywords: certificate;ssl;tls;openssl;ca;pki;
 
+appImage:
+  # productName contains a space, so the default would emit
+  # "OnliCert Manager-0.1.2.AppImage" — and GitHub rewrites spaces to dots on
+  # upload, which would leave the filename in the README wrong.
+  artifactName: OnliCert-Manager-${version}.${ext}
+
 deb:
+  # Debian convention: lowercase name, underscores, and the Debian arch name.
+  artifactName: onlicert-manager_${version}_${arch}.${ext}
   # OpenSSL is invoked as an external binary, so it is a hard runtime dependency.
   depends:
     - openssl
