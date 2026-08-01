@@ -75,7 +75,17 @@
     "create": "Emitir Certificado",
     "renew": "Renovar",
     "revoke": "Revogar",
-    "export": "Exportar",
+    "export": {
+      "title": "Exportar Certificado",
+      "formats": {
+        "crt": "Certificado (CRT)",
+        "key": "Chave Privada (KEY)",
+        "pem": "PEM (cert + chave)",
+        "pfx": "PKCS#12 (PFX/P12)",
+        "der": "DER (binário)",
+        "zip": "Pacote ZIP (todos)"
+      }
+    },
     "delete": "Excluir",
     "validate": "Validar",
     "noCerts": "Nenhum certificado emitido",
@@ -125,18 +135,8 @@
       "ip": "Endereço IP",
       "validity": "Validade (dias)",
       "algorithm": "Algoritmo",
-      "addSAN": "Adicionar SAN"
-    },
-    "export": {
-      "title": "Exportar Certificado",
-      "formats": {
-        "crt": "Certificado (CRT)",
-        "key": "Chave Privada (KEY)",
-        "pem": "PEM (cert + chave)",
-        "pfx": "PKCS#12 (PFX/P12)",
-        "der": "DER (binário)",
-        "zip": "Pacote ZIP (todos)"
-      }
+      "addSAN": "Adicionar SAN",
+      "commonNameHint": "O Nome Comum é incluído automaticamente nos Nomes Alternativos (SAN) — navegadores exigem isso."
     }
   },
   "servers": {

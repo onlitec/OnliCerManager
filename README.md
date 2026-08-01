@@ -105,7 +105,7 @@ Two formats are published for every release:
 1. Download `OnliCert-Manager-<version>-win-portable.zip` from [Releases](https://github.com/onlitec/OnliCerManager/releases).
 2. Extract the ZIP anywhere — a regular folder, an external drive, whatever.
 3. Run `OnliCert Manager.exe` inside the extracted folder. Nothing is installed and no admin rights are needed.
-4. Your CA, certificates and logs are **not** kept inside that folder — they live in `%APPDATA%\OnliCert Manager\` (see [Where your data lives](#where-your-data-lives)), so they survive moving or deleting the portable folder.
+4. Your CA, certificates and logs are **not** kept inside that folder — they live in `%APPDATA%\@onlicert\desktop\` (see [Where your data lives](#where-your-data-lives)), so they survive moving or deleting the portable folder.
 
 </details>
 
@@ -191,8 +191,8 @@ Everything is local — no cloud account, no telemetry. The SQLite database and 
 
 | Platform | Location |
 |---|---|
-| Windows | `%APPDATA%\OnliCert Manager\` |
-| Linux | `~/.config/OnliCert Manager/` |
+| Windows | `%APPDATA%\@onlicert\desktop\` |
+| Linux | `~/.config/@onlicert/desktop/` |
 
 This is the same folder for the AppImage, the `.deb` and the portable build, so switching between them keeps your CA and certificates.
 

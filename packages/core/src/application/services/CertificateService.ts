@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Certificate, CertificateAlgorithm, CreateCertificateInput } from "../../domain/entities/Certificate";
-import { formatSANsForOpenSSL, parseSANs } from "../../domain/value-objects/SubjectAlternativeName";
+import { ensureCommonNameInSANs, formatSANsForOpenSSL, parseSANs } from "../../domain/value-objects/SubjectAlternativeName";
 import type { ICARepository } from "./CAService";
 
 export interface ICertificateRepository {
@@ -85,8 +85,10 @@ export class CertificateService {
     // 3. Generate Leaf Private Key
     const leafKeyPem = await this.infra.generatePrivateKey({ algorithm });
 
-    // 4. Format SANs for OpenSSL
-    const parsedSANs = parseSANs(san.join(","));
+    // 4. Format SANs for OpenSSL. The Common Name is always included: browsers
+    //    verify the hostname against the SAN extension only, so a certificate
+    //    without its CN there is rejected no matter how it was issued.
+    const parsedSANs = ensureCommonNameInSANs(commonName, parseSANs(san.join(",")));
     const formattedSANs = formatSANsForOpenSSL(parsedSANs);
     const sanList = formattedSANs ? [formattedSANs] : [];
 
@@ -130,7 +132,9 @@ export class CertificateService {
       name,
       type,
       commonName,
-      san,
+      // The effective list, not the caller's input — the CN is added above, and
+      // the record should show what the certificate actually carries.
+      san: formattedSANs ? formattedSANs.split(",") : [],
       certPem,
       keyEncrypted: leafKeyEncrypted,
       csrPem,

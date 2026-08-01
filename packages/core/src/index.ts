@@ -4,7 +4,12 @@ export type { CertificateAuthority, CAAlgorithm, CreateCAInput, ImportCAInput } 
 export type { Server, ServerType } from "./domain/entities/Server";
 
 // Value Objects
-export { parseSANs, formatSANsForOpenSSL } from "./domain/value-objects/SubjectAlternativeName";
+export {
+  parseSANs,
+  formatSANsForOpenSSL,
+  ensureCommonNameInSANs,
+  isIpAddress,
+} from "./domain/value-objects/SubjectAlternativeName";
 export type { SubjectAlternativeName, SANType } from "./domain/value-objects/SubjectAlternativeName";
 
 export { getKeyUsageProfile } from "./domain/value-objects/KeyUsage";

@@ -75,7 +75,17 @@
     "create": "Issue Certificate",
     "renew": "Renew",
     "revoke": "Revoke",
-    "export": "Export",
+    "export": {
+      "title": "Export Certificate",
+      "formats": {
+        "crt": "Certificate (CRT)",
+        "key": "Private Key (KEY)",
+        "pem": "PEM (cert + key)",
+        "pfx": "PKCS#12 (PFX/P12)",
+        "der": "DER (binary)",
+        "zip": "ZIP Package (all)"
+      }
+    },
     "delete": "Delete",
     "validate": "Validate",
     "noCerts": "No certificates issued",
@@ -125,18 +135,8 @@
       "ip": "IP Address",
       "validity": "Validity (days)",
       "algorithm": "Algorithm",
-      "addSAN": "Add SAN"
-    },
-    "export": {
-      "title": "Export Certificate",
-      "formats": {
-        "crt": "Certificate (CRT)",
-        "key": "Private Key (KEY)",
-        "pem": "PEM (cert + key)",
-        "pfx": "PKCS#12 (PFX/P12)",
-        "der": "DER (binary)",
-        "zip": "ZIP Package (all)"
-      }
+      "addSAN": "Add SAN",
+      "commonNameHint": "The Common Name is added to the Subject Alternative Names automatically — browsers require it."
     }
   },
   "servers": {

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/useToast";
+import { isIpAddress } from "@onlicert/core";
 import type { CertificateType, CertificateAlgorithm } from "@onlicert/core";
 
 interface CreateCertDialogProps {
@@ -28,15 +29,18 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
 
   const [loading, setLoading] = useState(false);
   const [sanInput, setSanInput] = useState("");
-  const [sanList, setSanList] = useState<string[]>(["DNS:app.local", "IP:192.168.1.100"]);
+  // Empty, not pre-filled with examples: placeholder values that look like real
+  // input get submitted by accident, producing certificates for hosts nobody
+  // owns. The example text lives in the fields' placeholders instead.
+  const [sanList, setSanList] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
-    name: "Servidor Web App",
+    name: "",
     type: "server" as CertificateType,
-    commonName: "app.local",
+    commonName: "",
     validityDays: "365",
     algorithm: "RSA_2048" as CertificateAlgorithm,
-    organization: "Minha Empresa",
+    organization: "",
     caPassword: "",
   });
 
@@ -53,6 +57,15 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
   const handleRemoveSAN = (index: number) => {
     setSanList(sanList.filter((_, i) => i !== index));
   };
+
+  // Mirrors ensureCommonNameInSANs on the domain side, purely so the user can
+  // see what the certificate will actually contain before issuing it.
+  const commonName = formData.commonName.trim();
+  const implicitCommonNameSAN =
+    commonName.length > 0 &&
+    !sanList.some((s) => s.slice(s.indexOf(":") + 1).toLowerCase() === commonName.toLowerCase())
+      ? `${isIpAddress(commonName) ? "IP" : "DNS"}:${commonName}`
+      : null;
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -111,6 +124,7 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
                 id="cert-name"
                 value={formData.name}
                 onChange={(e) => { setFormData({ ...formData, name: e.target.value }); }}
+                placeholder="Servidor Web App"
                 required
               />
             </div>
@@ -146,6 +160,9 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
                 placeholder="app.empresa.local ou 192.168.1.10"
                 required
               />
+              <p className="text-[11px] leading-snug text-muted-foreground">
+                {t("certificates.form.commonNameHint")}
+              </p>
             </div>
             <div className="space-y-2">
               <Label>{t("certificates.form.algorithm")} *</Label>
@@ -212,6 +229,16 @@ export function CreateCertDialog({ open, onOpenChange, onSuccess }: CreateCertDi
             </div>
 
             <div className="flex flex-wrap gap-1.5 pt-1">
+              {/* The CN is added server-side; show it here so the effective list
+                  the certificate will carry is visible before issuing. */}
+              {implicitCommonNameSAN !== null && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 font-mono text-xs text-primary"
+                  title={t("certificates.form.commonNameHint")}
+                >
+                  {implicitCommonNameSAN}
+                </span>
+              )}
               {sanList.map((san, index) => (
                 <span
                   key={index}
