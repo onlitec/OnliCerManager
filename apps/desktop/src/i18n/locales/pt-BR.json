@@ -145,10 +145,10 @@
     "add": "Adicionar Servidor",
     "testConnection": "Testar Conexão",
     "deploy": {
-      "password": "Senha da Chave Privada",
-      "passwordPlaceholder": "Senha usada ao emitir o certificado",
-      "passwordHint": "Necessária para descriptografar a chave privada antes de enviá-la ao servidor. É a senha da CA, ou a específica do certificado se você definiu uma.",
-      "passwordRequired": "Informe a senha da chave privada."
+      "password": "Senha da CA",
+      "passwordPlaceholder": "A mesma senha usada para emitir certificados",
+      "passwordHint": "É a senha mestra que você definiu ao criar a CA — a mesma pedida na emissão. Ela descriptografa a chave privada antes do envio ao servidor.",
+      "passwordRequired": "Informe a senha da CA."
     },
     "deployShort": "Implantar",
     "noServers": "Nenhum servidor configurado",

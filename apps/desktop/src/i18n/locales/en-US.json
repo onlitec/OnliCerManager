@@ -145,10 +145,10 @@
     "add": "Add Server",
     "testConnection": "Test Connection",
     "deploy": {
-      "password": "Private Key Password",
-      "passwordPlaceholder": "Password used when issuing the certificate",
-      "passwordHint": "Needed to decrypt the private key before sending it to the server. This is the CA password, or the certificate-specific one if you set it.",
-      "passwordRequired": "Enter the private key password."
+      "password": "CA Password",
+      "passwordPlaceholder": "The same password you use to issue certificates",
+      "passwordHint": "This is the master password you set when creating the CA — the same one issuing asks for. It decrypts the private key before it is sent to the server.",
+      "passwordRequired": "Enter the CA password."
     },
     "deployShort": "Deploy",
     "noServers": "No servers configured",
