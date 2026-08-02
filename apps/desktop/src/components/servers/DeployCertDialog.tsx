@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/useToast";
 import type { Certificate, Server } from "@onlicert/core";
@@ -27,6 +28,7 @@ export function DeployCertDialog({ open, onOpenChange, server }: DeployCertDialo
 
   const [certs, setCerts] = useState<Certificate[]>([]);
   const [selectedCertId, setSelectedCertId] = useState<string>("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -48,18 +50,27 @@ export function DeployCertDialog({ open, onOpenChange, server }: DeployCertDialo
 
   const handleDeploy = async () => {
     if (!server || !selectedCertId) return;
-    const cert = certs.find((c) => c.id === selectedCertId);
-    if (!cert) return;
+    if (!password) {
+      toast({
+        title: t("common.error"),
+        description: t("servers.deploy.passwordRequired"),
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     setResult(null);
 
     try {
+      // Only the id and the password cross IPC: the main process reads the
+      // certificate and decrypts its private key, so key material never reaches
+      // the renderer.
       const res = await window.electron.invoke<{ success: boolean; message: string }>(
         "server:deploy",
         server.id,
-        cert.certPem,
-        cert.keyEncrypted
+        selectedCertId,
+        password
       );
 
       setResult(res);
@@ -104,6 +115,21 @@ export function DeployCertDialog({ open, onOpenChange, server }: DeployCertDialo
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="deploy-password">{t("servers.deploy.password")} *</Label>
+            <Input
+              id="deploy-password"
+              type="password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); }}
+              placeholder={t("servers.deploy.passwordPlaceholder")}
+              autoComplete="off"
+            />
+            <p className="text-[11px] leading-snug text-muted-foreground">
+              {t("servers.deploy.passwordHint")}
+            </p>
           </div>
 
           {result && (

@@ -144,7 +144,12 @@
     "subtitle": "Install certificates automatically",
     "add": "Add Server",
     "testConnection": "Test Connection",
-    "deploy": "Deploy Certificate",
+    "deploy": {
+      "password": "Private Key Password",
+      "passwordPlaceholder": "Password used when issuing the certificate",
+      "passwordHint": "Needed to decrypt the private key before sending it to the server. This is the CA password, or the certificate-specific one if you set it.",
+      "passwordRequired": "Enter the private key password."
+    },
     "deployShort": "Deploy",
     "noServers": "No servers configured",
     "noServersDescription": "Register a server from the library (Proxmox, MikroTik, NGINX, Apache, Traefik, Docker, TrueNAS) or a custom SSH server to deploy certificates automatically.",

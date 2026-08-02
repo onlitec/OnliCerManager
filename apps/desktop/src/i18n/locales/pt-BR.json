@@ -144,7 +144,12 @@
     "subtitle": "Instale certificados automaticamente",
     "add": "Adicionar Servidor",
     "testConnection": "Testar Conexão",
-    "deploy": "Instalar Certificado",
+    "deploy": {
+      "password": "Senha da Chave Privada",
+      "passwordPlaceholder": "Senha usada ao emitir o certificado",
+      "passwordHint": "Necessária para descriptografar a chave privada antes de enviá-la ao servidor. É a senha da CA, ou a específica do certificado se você definiu uma.",
+      "passwordRequired": "Informe a senha da chave privada."
+    },
     "deployShort": "Implantar",
     "noServers": "Nenhum servidor configurado",
     "noServersDescription": "Cadastre um servidor da biblioteca (Proxmox, MikroTik, NGINX, Apache, Traefik, Docker, TrueNAS) ou um servidor personalizado via SSH para implantação automática de certificados.",

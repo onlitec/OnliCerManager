@@ -3,6 +3,9 @@ import { randomUUID } from "node:crypto";
 import {
   DatabaseConnection,
   ServerRepository,
+  CertificateRepository,
+  CARepository,
+  AES256Service,
   PluginRegistry,
   createCustomSSHPlugin,
   createNginxPlugin,
@@ -22,6 +25,8 @@ export function setupServerIpcHandlers(): void {
   const dataDir = app.getPath("userData");
   const db = DatabaseConnection.getInstance(dataDir);
   const serverRepo = new ServerRepository(db);
+  const certRepo = new CertificateRepository(db);
+  const caRepo = new CARepository(db);
 
   // Register Built-in & Preset Plugins
   const registry = PluginRegistry.getInstance();
@@ -86,20 +91,46 @@ export function setupServerIpcHandlers(): void {
   });
 
   // Deploy certificate to server
-  ipcMain.handle("server:deploy", async (_event, serverId: string, certPem: string, keyPem: string, caPem?: string) => {
+  // Takes a certificate id and the password, not the key itself: the private key
+  // is stored encrypted and has to be decrypted here before deployment. The
+  // previous signature took the key from the renderer, which passed the
+  // encrypted blob straight through — servers ended up with a `server.key` that
+  // was AES ciphertext, and nginx refused to start TLS with
+  // "PEM_read_bio_PrivateKey() failed ... No supported data to decode".
+  // Keeping the key material in the main process also means it never crosses IPC.
+  ipcMain.handle("server:deploy", async (_event, serverId: string, certificateId: string, password: string) => {
     try {
       const server = serverRepo.getById(serverId);
       if (!server) throw new Error("Servidor não encontrado.");
+
+      const certificate = certRepo.getById(certificateId);
+      if (!certificate) throw new Error("Certificado não encontrado.");
+
+      if (!password) throw new Error("A senha da chave privada é obrigatória para implantar.");
+
+      let keyPem: string;
+      try {
+        keyPem = AES256Service.decrypt(certificate.keyEncrypted, password);
+      } catch {
+        throw new Error("Senha incorreta — não foi possível descriptografar a chave privada.");
+      }
+
+      if (!keyPem.includes("PRIVATE KEY")) {
+        // Belt and braces: never ship something that isn't a private key.
+        throw new Error("A chave privada descriptografada é inválida.");
+      }
 
       const plugin = registry.get(server.type);
       if (!plugin) throw new Error(`Plugin para o tipo '${server.type}' não encontrado.`);
 
       logger.info("Starting certificate deploy", { serverId, serverName: server.name, pluginId: plugin.metadata.id });
 
+      const activeCA = caRepo.getActive();
+
       const result = await plugin.deploy({
-        certPem,
+        certPem: certificate.certPem,
         keyPem,
-        ...(caPem ? { caPem } : {}),
+        ...(activeCA ? { caPem: activeCA.certPem } : {}),
         serverConfig: server.config,
       });
 
