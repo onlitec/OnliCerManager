@@ -59,6 +59,19 @@ pnpm build
 
 Or scoped to the package you touched: `pnpm --filter <name> <script>` (e.g. `pnpm --filter @onlicert/infrastructure test`).
 
+### End-to-end tests
+
+```bash
+pnpm --filter desktop build   # produces dist-release/<platform>-unpacked/
+pnpm test:e2e
+```
+
+These launch the **packaged** binary and drive it through the real IPC bridge. They exist because the unit tests cannot see the failures that actually reach users: a static method detached by an IPC adapter, a Node built-in bundled into the renderer, a file read from inside the asar archive, an encrypted private key written to a server. All four shipped in releases where lint, typecheck and every unit test were green.
+
+If you fix something that only reproduces in a packaged build, add a case to `apps/desktop/e2e/app.spec.ts`. Confirm it fails against the old build before you trust it.
+
+The tests run with a throwaway `--user-data-dir`, so they never touch your own CA. Keep it that way.
+
 Notes:
 - `packages/infrastructure` tests spawn the real OpenSSL binary — make sure it's installed and on `PATH`.
 - TypeScript strict mode is enforced repo-wide (`strict`, `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`). ESLint uses `strictTypeChecked`; `no-explicit-any` and `no-non-null-assertion` are errors.

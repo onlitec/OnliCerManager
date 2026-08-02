@@ -36,7 +36,9 @@ cd packages/infrastructure && pnpm vitest run src/openssl/openssl.test.ts
 cd packages/infrastructure && pnpm vitest run -t "encrypts and decrypts"
 ```
 
-`apps/desktop` also has `test:e2e` (`playwright test`) in `package.json`, but no Playwright config currently exists in the repo — treat e2e as not yet wired up rather than assuming it runs.
+`pnpm test:e2e` runs Playwright against the **packaged** app (`apps/desktop/e2e/`), so `pnpm --filter desktop build` must have produced `dist-release/<platform>-unpacked/` first. It launches the real binary and drives it through `window.electron.invoke`, rather than clicking the UI.
+
+That distinction is deliberate: every serious defect this project has shipped was invisible to lint, typecheck and the unit tests, and only existed once the app was compiled and running — a static method detached by an IPC adapter, a Node built-in bundled into the renderer, a file read from inside the asar archive, an encrypted key written to a server. Each of those has a test in `e2e/app.spec.ts`. Add to it when fixing anything that only reproduces in a packaged build. Tests use a throwaway `--user-data-dir`; never let them touch the real profile.
 
 Infrastructure package tests spawn the real OpenSSL binary (see `openssl.test.ts`, `database.test.ts`) — OpenSSL must be installed and on PATH on every platform (CI installs it via `apt-get install openssl` on Linux; on Windows it comes from Git for Windows or a separate install).
 

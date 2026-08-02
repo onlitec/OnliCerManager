@@ -12,3 +12,7 @@ coverage
 # repository stays free of vendored binaries.
 apps/desktop/resources/openssl
 resources/openssl
+
+# Playwright
+apps/desktop/test-results
+apps/desktop/playwright-report

@@ -125,6 +125,21 @@ jobs:
             scripts/verify_native_modules.js \
             "apps/desktop/dist-release/${{ matrix.unpacked }}"
 
+      - name: End-to-end tests against the packaged app
+        # Drives the packaged binary through its real IPC bridge: creates a CA,
+        # issues a certificate, resolves the manual out of the asar archive.
+        # Every one of these guards a defect that shipped in a release because
+        # lint, typecheck and the unit tests all passed.
+        run: ${{ runner.os == 'Linux' && 'xvfb-run -a' || '' }} pnpm test:e2e
+
+      - name: Upload e2e artefacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-${{ matrix.platform }}
+          path: apps/desktop/test-results
+          if-no-files-found: ignore
+
       - name: Collect artifacts
         id: collect
         # Keep the list of what gets published in one place, and fail loudly if
